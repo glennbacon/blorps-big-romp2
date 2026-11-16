@@ -381,11 +381,16 @@ function layout(){
   if(scene.fog&&TH&&!mapOn){ scene.fog.near=camDist+TH.fogNear; scene.fog.far=camDist+TH.fogFar; } /* the map keeps its own haze */
 }
 window.addEventListener('resize',layout);
-const hudC={lives:-1,coins:-1,score:-1,shards:-1};
+const hudC={lives:-1,coins:-1,score:-1,shards:-1,boss:-1};
 function updateHud(){
   if(hudC.lives!==G.lives){ hudC.lives=G.lives; $('h-lives').textContent=G.lives; }
   if(hudC.coins!==G.coins){ hudC.coins=G.coins; $('h-coins').textContent=String(G.coins).padStart(2,'0'); }
   if(hudC.score!==G.score){ hudC.score=G.score; $('h-score').textContent=String(G.score).padStart(6,'0'); }
+  /* a boss in sight: its name, and a pip for every stomp it can still take */
+  let boss=null; if(G.bossSeen&&!mapOn&&G.state!=='title') for(const e of enemies) if(e.K.boss&&!e.dead) boss=e;
+  const pips=boss?Math.ceil(boss.hp/3):-1;
+  if(hudC.boss!==pips){ hudC.boss=pips; $('boss-bar').hidden=pips<0;
+    if(boss){ $('boss-name').textContent=BOSS_NAMES[boss.type]; let h=''; for(let i=0;i<Math.ceil(boss.hp0/3);i++) h+=i<pips?'<i class="on"></i>':'<i></i>'; $('boss-hp').innerHTML=h; } }
   /* in a level: this level's three shards. On the map: how many of them all. */
   const sh=mapOn?1000+shardTotal():(G.shards[G.levelIdx]|0);
   if(hudC.shards!==sh){ hudC.shards=sh; $('h-shards').hidden=mapOn; $('h-moon').hidden=!mapOn; if(mapOn) $('h-moons').textContent=shardTotal()+'/'+LEVELS.length*3; else paintShards($('h-shards'),G.levelIdx); }

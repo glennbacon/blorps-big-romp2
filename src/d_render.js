@@ -7,6 +7,7 @@ try{ renderer=new T.WebGLRenderer({canvas,antialias:true,alpha:false,powerPrefer
 catch(e){ $('nogl').hidden=false; return; }
 renderer.setClearColor(0x1c1233,1);
 renderer.shadowMap.enabled=true; renderer.shadowMap.type=T.PCFSoftShadowMap;
+renderer.info.autoReset=false; /* counted per frame, over every pass: see renderFrame */
 const scene=new T.Scene();
 const camera=new T.PerspectiveCamera(30,1,1,220);
 const hemi=new T.HemisphereLight(0xffffff,0x888888,0.6); scene.add(hemi);
@@ -125,6 +126,7 @@ function sizePost(w,h){
   POST.tilt=[mkRT(Math.max(2,w>>1),Math.max(2,h>>1),false),mkRT(Math.max(2,w>>2),Math.max(2,h>>2),false)];
 }
 function renderFrame(){
+  renderer.info.reset();
   const post=QUALITY[Q.level].post&&POST.rt;
   if(!post){ renderer.setRenderTarget(null); renderer.render(scene,camera); }
   else {

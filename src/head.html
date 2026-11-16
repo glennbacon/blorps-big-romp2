@@ -47,6 +47,12 @@ body{background:var(--ink);color:var(--paper);font-family:var(--font-body);font-
 .card .moons i{background:#d9cfb4}
 .card .moons i.got{background:var(--grape);filter:none}
 [hidden]{display:none!important}
+/* a boss's name and how many stomps it has left in it */
+#boss-bar{position:absolute;left:50%;top:3.5em;transform:translateX(-50%);z-index:3;margin:0;display:flex;align-items:center;gap:.6em;padding:.35em .7em;background:rgba(28,18,51,.84);color:var(--coin);border-radius:5px;
+  font:700 clamp(14px,1.5vmin + 8px,20px)/1 var(--font-display);pointer-events:none;white-space:nowrap}
+#boss-hp{display:flex;gap:4px}
+#boss-hp i{width:.8em;height:.8em;background:#4a416b;border-radius:2px}
+#boss-hp i.on{background:var(--berry)}
 #hint{position:absolute;left:50%;bottom:clamp(12px,5vh,44px);transform:translateX(-50%);z-index:3;margin:0;max-width:min(92%,560px);padding:.5em .9em;background:var(--paper);color:var(--ink);border:3px solid var(--ink);border-radius:8px;
   box-shadow:0 5px 0 var(--ink);font-size:clamp(15px,2.3vmin,20px);line-height:1.25;text-align:center;text-wrap:balance;pointer-events:none;animation:hint-in .18s ease-out}
 #hint b{color:var(--grape)}
@@ -195,6 +201,7 @@ body.map #pad-move [data-k=down]{grid-area:3/2}
       </div>
     </div>
 
+    <p id="boss-bar" hidden><span id="boss-name"></span><span id="boss-hp"></span><span class="sr">stomps left</span></p>
     <p id="hint" hidden></p>
 
     <div id="overlay" class="s-title">
