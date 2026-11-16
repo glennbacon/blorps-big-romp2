@@ -31,10 +31,11 @@ function addVox(boxes,scale,mat,lit,sway){
 const LM=t=>new T.MeshLambertMaterial({map:t,vertexColors:true});
 const iceMat=LM(texIce());
 const matCache={};
-function themeMats(name){
-  if(matCache[name]) return matCache[name];
-  const c=THEMES[name];
-  return matCache[name]={ gTop:LM(texTop(c)), gSide:LM(texSide(c)), gDirt:LM(texDirt(c)), gUnder:LM(texUnder(c)), hard:LM(texHard(c.hard)),
+/* the textured materials of a theme. A look may repaint the ground or the blocks, so they are kept per palette, not per theme. */
+function themeMats(c){
+  const key=[c.top,c.dirt,c.cap,c.capD,c.brick[0],c.hard[0],c.semi,c.stone?1:0].concat(c.topS,c.dirtS).join();
+  if(matCache[key]) return matCache[key];
+  return matCache[key]={ gTop:LM(texTop(c)), gSide:LM(texSide(c)), gDirt:LM(texDirt(c)), gUnder:LM(texUnder(c)), hard:LM(texHard(c.hard)),
     sTop:LM(texSemi(c.semi,0)), sSide:LM(texSemi(c.semi,1)), sFace:LM(texSemi(c.semi,2)), sUnder:new T.MeshLambertMaterial({color:SEMI_UNDER[c.semi]}), brick:new T.MeshLambertMaterial({map:texBrick(c.brick)}), ice:iceMat,
     cvTop:cvTopMat, cvL:cvLMat, cvR:cvRMat };
 }
@@ -67,13 +68,15 @@ function buildTerrain(){
     if(y<0) return tiles[cx]===GROUND?GROUND:AIR;
     const id=tiles[y*W+cx]; return (x<0||x>=W)?(id===GROUND?GROUND:AIR):id; };
   const full=(x,y)=>{ const id=vis(x,y); return id===GROUND||id===ICE; };
-  const covers=(x,y,zf,zb)=>{ const d=DEPTH[vis(x,y)]; return !!d&&vis(x,y)!==SEMI&&d[0]>=zf&&d[1]<=zb; };
+  /* a belt set into the floor (below the walking surface) is as deep as the floor */
+  const depthAt=(x,y)=>{ const id=vis(x,y); return (id===CONV_L||id===CONV_R)&&y<2?DEPTH[GROUND]:DEPTH[id]; };
+  const covers=(x,y,zf,zb)=>{ const d=depthAt(x,y); return !!d&&vis(x,y)!==SEMI&&d[0]>=zf&&d[1]<=zb; };
   const wallish=(x,y)=>{ const id=vis(x,y); return id!==AIR&&id!==SEMI&&id!==COIN&&id!==SPIKE&&id!==HIDDEN&&id!==RED&&id!==BLUE; };
   /* how far a tile's top is below open air, 0 to 5 */
   const under=(x,y)=>{ let n=0; while(n<5&&full(x,y+1+n)) n++; return n; };
   const dim=n=>1-0.075*Math.min(n,5);
   for(let y=-5;y<H;y++) for(let x=-14;x<W+14;x++){
-    const id=vis(x,y), d=DEPTH[id]; if(!d) continue;
+    const id=vis(x,y), d=depthAt(x,y); if(!d) continue;
     const zf=d[0], zb=d[1], dz=zf-zb;
     if(id===SEMI){
       const y0=y+0.5, y1=y+1;

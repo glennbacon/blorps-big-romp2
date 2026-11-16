@@ -40,10 +40,10 @@ body{background:var(--ink);color:var(--paper);font-family:var(--font-body);font-
 .ico{width:1.05em;height:1.05em;display:block;image-rendering:pixelated}
 #h-level{color:var(--coin)}
 /* the level's three moon shards: dim until found */
-.moons{gap:4px}
-.moons i{width:.95em;height:.95em;display:block;border-radius:50%;background:#4a416b;-webkit-mask:radial-gradient(circle at 78% 36%,transparent 46%,#000 49%);mask:radial-gradient(circle at 78% 36%,transparent 46%,#000 49%)}
+.moons{display:inline-flex;align-items:center;gap:4px}
+.moons i{width:.95em;height:.95em;display:block;flex:none;border-radius:50%;background:#5d5485;-webkit-mask:radial-gradient(circle at 78% 36%,transparent 46%,#000 49%);mask:radial-gradient(circle at 78% 36%,transparent 46%,#000 49%)}
 .moons i.got{background:#dff1ff;filter:drop-shadow(0 0 3px #9fd4ff)}
-.card .moons{justify-content:center;gap:8px;font-size:30px}
+.card .moons{display:flex;justify-content:center;gap:8px;font-size:30px}
 .card .moons i{background:#d9cfb4}
 .card .moons i.got{background:var(--grape);filter:none}
 [hidden]{display:none!important}

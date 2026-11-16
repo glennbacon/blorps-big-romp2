@@ -233,12 +233,13 @@ function harness(){
     }
     /* nor may anything tall stand where the hut after the flag does: it would poke out of the walls or roof */
     if(L0.goal){
-      const ox=(L0.goal.x+HUT_DX)*8, seen=new Set(); let hx0=1e9, hx1=-1e9, hz0=1e9, hz1=-1e9;
+      const ox=(L0.goal.x+HUT_DX)*8, gy8=L0.goal.y*8, seen=new Set(); let hx0=1e9, hx1=-1e9, hz0=1e9, hz1=-1e9;
       for(const b of mHut()){ hx0=Math.min(hx0,b[0]+ox); hx1=Math.max(hx1,b[0]+b[3]+ox); hz0=Math.min(hz0,b[2]+HUT_Z); hz1=Math.max(hz1,b[2]+b[5]+HUT_Z); }
       for(const q of placed){
         if(q.ox===ox&&q.oz===HUT_Z) continue; /* the hut itself */
+        if(Math.abs(q.oy-gy8)>4) continue;    /* something on another floor of a tall level */
         for(const b of q.model){ const x0=b[0]+q.ox, x1=x0+b[3], top=b[1]+b[4]+q.oy, back=b[2]+q.oz, front=back+b[5];
-          if(top>16+12&&x1>hx0&&x0<hx1&&front>hz0&&back<hz1) seen.add(Math.round(q.ox/8)); }
+          if(top>gy8+12&&x1>hx0&&x0<hx1&&front>hz0&&back<hz1) seen.add(Math.round(q.ox/8)); }
       }
       for(const x of seen) out.push('a tall prop near x '+x+' overlaps the hut after the flag');
     }

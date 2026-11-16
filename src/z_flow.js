@@ -12,9 +12,9 @@ function unloadLevel(){
 }
 function loadLevel(idx,fromCp){
   unloadLevel();
-  G.levelIdx=idx; L=LEVELS[idx](); W=L.W; H=L.H; tiles=L.tiles; M=themeMats(L.theme); swOn=true; room=L.rooms[0]; G.under=false;
+  G.levelIdx=idx; L=LEVELS[idx](); W=L.W; H=L.H; tiles=L.tiles; swOn=true; room=L.rooms[0]; G.under=false;
   /* each level in a world can restyle the sky and light a little, so five levels do not look like one */
-  const base=THEMES[L.theme]; TH=Object.assign({},base,base.looks&&base.looks[L.look===null?L.stage:L.look]); GRAV=TH.grav||1;
+  const base=THEMES[L.theme]; TH=Object.assign({},base,base.looks&&base.looks[L.look===null?L.stage:L.look]); GRAV=TH.grav||1; M=themeMats(TH);
   /* where the pits hold water, it can be swum in like any pool */
   if(TH.liquid.kind==='water'&&L.liquidY>0) L.waters.push({x0:-99,y0:-9,x1:W+99,y1:L.liquidY+0.14,base:true});
   applyTheme();
@@ -438,7 +438,7 @@ function boot(data){
   lastT=performance.now();
   requestAnimationFrame(frame);
 }
-window.__romp={G,player,input,kb,MAPST,Q,POST,WP,quality:n=>setQuality(n,true),map:()=>showMap(-1),open:n=>{ G.open=n; mapViewSync(); mapBanner(); },at:i=>{ mapPlace(i); mapBanner(); },zoom:k=>{ mapZoom=k; },
+window.__romp={G,player,input,kb,MAPST,Q,POST,WP,wipe,quality:n=>setQuality(n,true),map:()=>showMap(-1),open:n=>{ G.open=n; mapViewSync(); mapBanner(); },at:i=>{ mapPlace(i); mapBanner(); },zoom:k=>{ mapZoom=k; },
   load:(i,cp)=>{ G.levelIdx=i; beginLevel(!!cp); },tp:(x,y)=>{ player.x=x; player.y=y; player.vx=player.vy=0; focusY=y; setRoom(); },form:f=>{ player.form=f; setSize(); },
   view:()=>({camX,camY,V,viewHalfW,W,H}),enemies:()=>enemies,items:()=>items,plats:()=>plats,step,solidAt,tileAt,L:()=>L,animate,updateCamera,info:()=>renderer.info.render,frame};
 if(hot&&hot.ready) hot.ready(boot); else boot((hot&&hot.data)||{});
