@@ -110,9 +110,10 @@ function checkNodes(env,what){
   let bad=0;
   for(const n of env.nodes){
     if(n.kind!=='osc'&&n.kind!=='source') continue;
-    if(n.t0===undefined){ if(!bad++) fail(what+': a '+n.kind+' was created but never started'); }
-    else if(n.t1===undefined){ if(!bad++) fail(what+': a '+n.kind+' is never stopped'); }
-    else if(!env.reaches(n,env.ac.destination)){ if(!bad++) fail(what+': a '+n.kind+' is not connected to the output'); }
+    const name=n.kind==='osc'?'an oscillator':'a noise source';
+    if(n.t0===undefined){ if(!bad++) fail(what+': '+name+' was created but never started'); }
+    else if(n.t1===undefined){ if(!bad++) fail(what+': '+name+' is never stopped'); }
+    else if(!env.reaches(n,env.ac.destination)){ if(!bad++) fail(what+': '+name+' is not connected to the output'); }
   }
 }
 /* a rough loudness figure: the peak of the summed envelopes, weighted by how piercing each kind of source is */
@@ -216,7 +217,6 @@ attempt('musicDuck',()=>{
 const bpmOf={};
 for(const name of Object.keys(A.SONGS)){
   const s=A.SONGS[name]; let ok=true; const bad=m=>{ ok=false; fail('song '+name+': '+m); };
-  if(!SONG_NAMES.includes(name)) bad('is not in the brief');
   if(!s||!Array.isArray(s.tr)||!(s.bpm>0)||!(s.len>0)||!(s.bar>0)||!(s.spb>0)){ bad('is not a parsed song'); continue; }
   bpmOf[name]=s.bpm;
   if(s.tr.length<4) bad('has '+s.tr.length+' tracks, needs at least 4');

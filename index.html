@@ -842,11 +842,11 @@ const sfx={
   jump(big=false){ tone('square',big?250:330,big?520:680,0.17,0.1); tone('triangle',big?125:165,big?260:340,0.15,0.2); },
   jump2(){ tone('square',520,1040,0.11,0.07); tone('sine',780,1560,0.14,0.14,0.02); auWhoosh('bandpass',1800,4200,0.15,0.3); },
   wallKick(){ tone('square',700,350,0.045,0.1); tone('square',440,900,0.08,0.1,0.04); hiss(0.04,0.12,0,2000); },
-  poundStart(){ tone('triangle',1800,480,0.2,0.24); tone('square',1810,485,0.2,0.03); },
-  poundLand(){ tone('sine',140,38,0.3,0.3); tone('triangle',92,40,0.22,0.28); auWhoosh('lowpass',1400,180,0.28,0.4); hiss(0.05,0.12,0,1200); },
+  poundStart(){ tone('triangle',1800,480,0.2,0.2); tone('square',1810,485,0.2,0.03); },
+  poundLand(){ tone('sine',140,38,0.3,0.26); tone('triangle',92,40,0.22,0.24); auWhoosh('lowpass',1400,180,0.28,0.34); hiss(0.05,0.12,0,1200); },
   glide(){ auWhoosh('bandpass',700,1900,0.4,0.22,0,0.4); },
   puff(){ hiss(0.05,0.05,0,1500); },
-  slide(){ tone('triangle',1400,300,0.7,0.2); tone('sine',2800,600,0.7,0.05); },
+  slide(){ tone('triangle',1400,300,0.7,0.17); tone('sine',2800,600,0.7,0.05); },
   spring(){ tone('sine',220,980,0.28,0.28); tone('square',220,980,0.2,0.05); tone('sine',440,1960,0.2,0.08,0.03); },
   launch(){ tone('sine',170,42,0.4,0.3); tone('sawtooth',110,700,0.4,0.05); auWhoosh('bandpass',300,3200,0.55,0.4,0,0.25); },
   pipe(){ [440,330,247].forEach((f,i)=>{ tone('square',f,f*0.62,0.13,0.1,i*0.16); tone('triangle',f/2,f*0.31,0.13,0.22,i*0.16); }); },
@@ -859,12 +859,12 @@ const sfx={
   sprout(){ jingle('square','C5 E5 G5 C6 E6 G6',0.045,0.09,0.08); jingle('triangle','C4 E4 G4 C5 E5 G5',0.045,0.2,0.08); },
   power(){ jingle('square','G4 C5 E5 G5 C6 E6 G6 C7',0.055,0.1,0.1); jingle('square','E4 G4 C5 E5 G5 C6 E6 G6',0.055,0.05,0.1); },
   oneup(){ jingle('square','E5 G5 E6 C6 D6 G6',0.1,0.11,0.14); jingle('triangle','C4 . G4 . B4 D5',0.1,0.24,0.14); },
-  check(){ jingle('triangle','C5 G5 C6',0.08,0.3,0.16); jingle('square','. . E6',0.08,0.06,0.2); },
+  check(){ jingle('triangle','C5 G5 C6',0.08,0.25,0.16); jingle('square','. . E6',0.08,0.06,0.2); },
   shard(n=1){
     const k=clamp(n|0,1,3)-1;
-    jingle('square',['E6 A6 C#7','E6 A6 C#7 E7','A5 C#6 E6 A6 C#7 E7 . A7'][k],0.06,0.08,0.2+k*0.08);
-    jingle('sine',['E7 A7','E7 A7 C#8','. . E7 A7 C#8 E8 . A8'][k],0.06,0.07,0.25,0.03);
-    if(k===2) jingle('triangle','A3 . E4 . A4 . . A4',0.06,0.26,0.3);
+    jingle('square',['E6 A6 C#7','E6 A6 C#7 E7','A5 C#6 E6 A6 C#7 E7 . A7'][k],0.06,0.07,0.2+k*0.08);
+    jingle('sine',['E7 A7','E7 A7 C#8','. . E7 A7 C#8 E8 . A8'][k],0.06,0.05,0.25,0.03);
+    if(k===2) jingle('triangle','A3 . E4 . A4 . . A4',0.06,0.2,0.3);
   },
   /* --- blocks and gadgets --- */
   bump(){ tone('triangle',170,80,0.11,0.3); tone('square',170,80,0.05,0.04); },
@@ -872,9 +872,9 @@ const sfx={
   crumble(){ auWhoosh('lowpass',900,150,0.4,0.36); tone('triangle',140,60,0.3,0.2); [0.06,0.15,0.26].forEach((d,i)=>tone('square',200-i*40,90,0.05,0.06,d)); },
   switchOn(){ tone('square',330,0,0.04,0.1); tone('square',660,0,0.1,0.1,0.05); hiss(0.02,0.1,0,3000); },
   thud(){ tone('triangle',110,45,0.22,0.3); tone('sine',80,40,0.2,0.25); hiss(0.12,0.12,0,200); },
-  clonk(){ tone('triangle',130,48,0.25,0.3); tone('sine',72,36,0.3,0.28,0.01); tone('square',300,90,0.05,0.09); hiss(0.1,0.16,0,400); },
+  clonk(){ tone('triangle',130,48,0.25,0.26); tone('sine',72,36,0.3,0.24,0.01); tone('square',300,90,0.05,0.09); hiss(0.1,0.16,0,400); },
   fuse(){ hiss(0.25,0.07,0,5000); auWob('square',2200,1700,0.22,0.025,0,43,300); },
-  explode(){ auWhoosh('lowpass',2600,90,0.8,0.4); tone('sine',120,30,0.5,0.3); tone('square',160,40,0.25,0.07); hiss(0.1,0.18,0,800); },
+  explode(){ auWhoosh('lowpass',2600,90,0.8,0.34); tone('sine',120,30,0.5,0.26); tone('square',160,40,0.25,0.07); hiss(0.1,0.18,0,800); },
   rocket(){ auWhoosh('bandpass',400,3400,0.45,0.36,0,0.2); tone('sawtooth',160,520,0.4,0.06); tone('square',900,300,0.06,0.07); },
   zap(){ auWob('sawtooth',1600,220,0.22,0.08,0,70,480); tone('square',2400,300,0.08,0.06); hiss(0.2,0.14,0,3500); },
   /* --- friends and foes --- */
@@ -883,7 +883,7 @@ const sfx={
   fire(){ tone('square',880,280,0.11,0.09); hiss(0.08,0.07,0,2500); },
   spit(){ tone('square',300,640,0.09,0.09); },
   shatter(){ hiss(0.14,0.18,0,2500); tone('square',1500,700,0.08,0.06); tone('sine',3100,1900,0.12,0.06,0.03); },
-  ghost(){ auWob('sine',700,620,0.16,0.22,0,13,40); auWob('sine',880,790,0.16,0.22,0.17,13,50); auWob('sine',620,470,0.32,0.22,0.34,11,45); },
+  ghost(){ auWob('sine',700,620,0.16,0.18,0,13,40); auWob('sine',880,790,0.16,0.18,0.17,13,50); auWob('sine',620,470,0.32,0.18,0.34,11,45); },
   hurt(){ jingle('square','E5 C5 A4 E4 C4',0.07,0.12,0.1); tone('triangle',220,70,0.3,0.2); },
   bossHit(){ tone('sawtooth',300,70,0.3,0.12); tone('triangle',150,50,0.3,0.24); hiss(0.15,0.18,0,300); },
   bossRoar(){ auWob('sawtooth',170,62,0.95,0.1,0,28,34); auWob('square',85,42,0.95,0.06,0,19,13); auWhoosh('lowpass',900,220,0.95,0.36,0,0.2); },
@@ -896,7 +896,7 @@ const sfx={
   /* --- jingles --- */
   die(){ jingle('square','B4 . F5 . F5 E5 D5 C5 . G4 . E4',0.085,0.11,0.14); jingle('triangle','G3 . D3 . D3 . G2 . . C3 . C2',0.085,0.26,0.16); },
   clear(){ jingle('square','G4 C5 E5 G5 C6 E6 G6 . E6 . G6',0.1,0.1,0.2); jingle('square','E4 G4 C5 E5 G5 C6 E6 . C6 . E6',0.1,0.05,0.2); jingle('triangle','C3 . G3 . C4 . G3 . C4 . C3',0.1,0.24,0.2); },
-  over(){ jingle('triangle','C5 . G4 . E4 . A4 B4 A4 Ab4 Bb4 Ab4 G4',0.13,0.28,0.22); jingle('sine','C3 . . . C3 . F3 . . Ab3 . . G3',0.13,0.26,0.4); },
+  over(){ jingle('triangle','C5 . G4 . E4 . A4 B4 A4 Ab4 Bb4 Ab4 G4',0.13,0.25,0.22); jingle('sine','C3 . . . C3 . F3 . . Ab3 . . G3',0.13,0.2,0.4); },
   win(){
     jingle('square','C5 C5 C5 E5 G5 . E5 G5 C6 . C6 E6 G6 . . C7',0.11,0.1,0.24); jingle('square','E4 E4 E4 G4 C5 . C5 E5 G5 . G5 C6 E6 . . G6',0.11,0.05,0.24);
     jingle('triangle','C3 . . C3 G3 . . G3 C4 . . E4 G4 . . C4',0.11,0.24,0.24); hiss(0.3,0.06,1.65,6000);
@@ -1064,8 +1064,8 @@ SONGS.map=(()=>{
   const a3=h+'C5 . F5 . A5 - C6 A5  D6 - A5 . F5 - D5 .  F5 . D5 . Bb4 - D5 F5  E5 - - . G5 - - . ';
   const ch='F Dm Bb C F Dm Gm C  Bb Bb F F Gm Gm C C7  F Dm Bb C F Dm Bb C';
   return song({key:'F major',bpm:96,sw:0.16},
-    [{w:'triangle',v:0.2,vib:8,s:0.6,e:1},a+b+a3],
-    [{w:'sine',v:0.08,g:0.6},musArp(ch,8,'. 5 8 5 . 5 3^ 5','F3')],
+    [{w:'triangle',v:0.13,vib:8,s:0.6,e:1},a+b+a3],
+    [{w:'sine',v:0.06,g:0.6},musArp(ch,8,'. 5 8 5 . 5 3^ 5','F3')],
     [{w:'triangle',v:0.24,g:0.8},musArp(ch,8,'1 . . 5 1 . 5 .','F2')],
     [{dr:1,v:0.6},'k . r . p . r r']);
 })();
@@ -1091,7 +1091,7 @@ SONGS.jungle=(()=>{
   const b='B5 - . F#5 B5 - D6 .  C#6 . B5 . F#5 - . .  B5 - . G5 B5 - D6 .  E6 . D6 . B5 - . .  G5 - . E5 G5 - B5 .  A5 . G5 . E5 - G5 .  A5 . C#6 . E6 . C#6 .  G6 . E6 . C#6 A5 G5 E5 ';
   const ch='D D G G D D A A  D D G G D A D D  Bm Bm G G Em Em A A7  D D G G D A D D';
   return song({key:'D major',bpm:144},
-    [{w:'triangle',v:0.12,h:4,g:0.6,e:1},a+a2+b+a2],
+    [{w:'triangle',v:0.13,h:4,g:0.6,e:1},a+a2+b+a2],
     [{w:'square',v:0.022,g:0.35},musArp(ch,8,'. 5 . 3^ . 5 . 3^','G3')],
     [{w:'triangle',v:0.25,g:0.6},musArp(ch,8,'1 . 8 1 . 8 5 .','E2')],
     [{dr:1,v:0.9},'kr . c cr s . b r '.repeat(7)+'kr . c c s b b b']);
@@ -1104,10 +1104,10 @@ SONGS.deep=(()=>{
     'Eb6 - - D6 C6 -  G5 - - - C6 -  C6 - - Bb5 Ab5 -  Eb5 - - - Ab5 -  F5 - G5 - Ab5 -  C6 - Bb5 - Ab5 -  Bb5 - - - - -  Ab5 - F5 - D5 - ';
   const ch='EbM7 EbM7 Cm7 Cm7 AbM7 AbM7 Bb Bb  EbM7 EbM7 Gm7 Gm7 Ab Bb Eb Eb  AbM7 AbM7 EbM7 EbM7 Fm7 Fm7 Bb Bb  Cm7 Cm7 AbM7 AbM7 Fm7 Fm7 Bb Bb7';
   return song({key:'Eb major',bpm:108,bpb:3,ec:1,fb:0.4},
-    [{w:'sine',v:0.2,vib:10,s:0.7,a:0.03,e:1},a+b],
-    [{w:'triangle',v:0.09,g:0.8,e:1},musArp(ch,6,'1 5 7 3^ 7 5','Ab3')],
-    [{w:'sine',v:0.05,s:0.9,a:0.15,g:1},musArp(ch,6,'5 - - - - -','Ab3')],
-    [{w:'triangle',v:0.24,s:0.5,g:0.95},musArp(ch,6,'1 - - - 5 -','Ab2')],
+    [{w:'sine',v:0.07,vib:10,s:0.7,a:0.03,e:1},a+b],
+    [{w:'triangle',v:0.04,g:0.8,e:1},musArp(ch,6,'1 5 7 3^ 7 5','Ab3')],
+    [{w:'sine',v:0.035,s:0.9,a:0.15,g:1},musArp(ch,6,'5 - - - - -','Ab3')],
+    [{w:'triangle',v:0.2,s:0.5,g:0.95},musArp(ch,6,'1 - - - 5 -','Ab2')],
     [{dr:1,v:0.5},'k . r . r .  k . r . r c']);
 })();
 /* world 4, Spooky Hollow: D minor on tiptoe, with a swing. Short plucked notes that creep past their neighbours, a ghost whistling far above, and a major-key middle so it stays friendly. */
@@ -1118,7 +1118,7 @@ SONGS.hollow=(()=>{
   const b='C6 - A5 . F5 . A5 .  C6 . C6 D6 C6 - A5 .  Bb5 - G5 . E5 . G5 .  Bb5 . Bb5 C6 Bb5 - G5 .  A5 - G5 . D5 . G5 .  Bb5 . A5 . G5 - D5 .  E5 . G5 . Bb5 . A5 G5  A5 - - . C#6 - - . ';
   const ch='Dm Dm Gm Gm Dm Dm A7 A7  Dm Dm Gm Gm Bb A7 Dm Dm  F F C7 C7 Gm Gm A7 A7  Dm Dm Gm Gm Bb A7 Dm Dm';
   return song({key:'D minor',bpm:116,sw:0.18},
-    [{w:'square',v:0.05,g:0.5,e:1},a+a2+b+a2],
+    [{w:'square',v:0.058,g:0.5,e:1},a+a2+b+a2],
     [{w:'triangle',v:0.11,g:0.35},musArp(ch,8,'. 3 . 5 . 3 . 5','G3')],
     [{w:'sine',v:0.04,vib:18,s:0.9,a:0.12,g:1},musArp(ch,8,'5 - - - - - - -','A4')],
     [{w:'triangle',v:0.25,g:0.5},musArp(ch,8,'1 . 5 . 8 . 5 .','F2')],
@@ -1134,8 +1134,8 @@ SONGS.works=(()=>{
   const b='F#5 - - A5 D6 - - .  C#6 - D6 - A5 - - .  E5 - - A5 C#6 - - .  B5 - C#6 - A5 - - .  G5 - - B5 E6 - - .  D6 - E6 - B5 - G5 .  A#5 - - C#6 F#6 - - .  E6 - C#6 - A#5 - F#5 . ';
   const ch='Bm Bm G G Em Em F# F#  Bm Bm G G Em F# Bm Bm  D D A A Em Em F# F#7  Bm Bm G G Em F# Bm Bm';
   return song({key:'B minor',bpm:138,spb:4},
-    [{w:'square',v:0.04,det:7,g:0.8,e:1},musX2(a+a2+b+a2)],
-    [{w:'square',v:0.018,g:0.45},musArp(ch,16,'1 5 8 5 3 5 8 5','D3')],
+    [{w:'square',v:0.048,det:7,g:0.8,e:1},musX2(a+a2+b+a2)],
+    [{w:'square',v:0.022,g:0.45},musArp(ch,16,'1 5 8 5 3 5 8 5','D3')],
     [{w:'triangle',v:0.26,g:0.6},musArp(ch,16,'1 . 1 . 8 . 1 . 1 . 1 . 8 . 5 .','E2')],
     [{dr:1,v:0.9},'kt . h . sT . h . kt . h k sT . h h '.repeat(7)+'kt . h . sT . h . kt . s . s s s s']);
 })();
@@ -1163,8 +1163,8 @@ SONGS.magma=(()=>{
   const b='G5 - - Bb5 Eb6 - - .  D6 - Eb6 - Bb5 - G5 .  F5 - - Bb5 D6 - - .  C6 - D6 - Bb5 - F5 .  Eb5 - - Ab5 C6 - - .  Bb5 - C6 - Ab5 - Eb5 .  D5 . G5 . B5 . D6 .  F6 - D6 - B5 G5 F5 D5 ';
   const ch='Cm Cm Ab Ab Fm Fm G G  Cm Cm Ab Ab Fm G Cm Cm  Eb Eb Bb Bb Ab Ab G G7  Cm Cm Ab Ab Fm G Cm Cm';
   return song({key:'C minor',bpm:168},
-    [{w:'sawtooth',v:0.045,det:10,g:0.8,e:1},a+a2+b+a2],
-    [{w:'square',v:0.02,g:0.4},musArp(ch,8,'8 5 3 5 8 5 3 5','G3')],
+    [{w:'sawtooth',v:0.055,det:10,g:0.8,e:1},a+a2+b+a2],
+    [{w:'square',v:0.024,g:0.4},musArp(ch,8,'8 5 3 5 8 5 3 5','G3')],
     [{w:'sawtooth',v:0.07,g:0.6},musArp(ch,8,'1 1 8 1 1 1 8 1','C2')],
     [{w:'triangle',v:0.2,g:0.9},musArp(ch,8,'1 - - . 1 - . .','G2')],
     [{dr:1,v:1},'k h s h k k s h '.repeat(7)+'k k s s k s s s']);
@@ -1178,9 +1178,9 @@ SONGS.moon=(()=>{
   const ch='Em Em CM7 CM7 Am Am B7 B7  Em Em CM7 CM7 Am B7 Em Em  G G D D CM7 CM7 B7 B7  Em Em CM7 CM7 Am B7 Em Em';
   return song({key:'E minor',bpm:104,ec:1.5,fb:0.45},
     [{w:'square',v:0.04,det:6,vib:12,s:0.7,a:0.03,e:1},a+a2+b+a2],
-    [{w:'sine',v:0.07,g:0.5,e:1},musArp(ch,8,'1 5 8 9 3^ 9 8 5','G3')],
-    [{w:'sine',v:0.05,s:0.9,a:0.2,g:1},musArp(ch,8,'5 - - - - - - -','E3')],
-    [{w:'triangle',v:0.26,s:0.6,g:0.95},musArp(ch,8,'1 - - - - - 5 -','E2')],
+    [{w:'sine',v:0.055,g:0.5,e:1},musArp(ch,8,'1 5 8 9 3^ 9 8 5','G3')],
+    [{w:'sine',v:0.035,s:0.9,a:0.2,g:1},musArp(ch,8,'5 - - - - - - -','E3')],
+    [{w:'triangle',v:0.2,s:0.6,g:0.95},musArp(ch,8,'1 - - - - - 5 -','E2')],
     [{dr:1,v:0.7},'k . h . . . h .  k . h . s . h h']);
 })();
 /* boss fights: G minor at a gallop. The harmony steps down G minor, F, E flat, D like a closing trap; the middle section swerves to A flat for drama. */
@@ -1191,8 +1191,8 @@ SONGS.boss=(()=>{
   const b='C6 - - Eb6 G6 - - .  F6 - Eb6 - C6 - G5 .  Bb5 - - D6 G6 - - .  F6 - D6 - Bb5 - G5 .  Ab5 - - C6 Eb6 - - .  D6 - C6 - Ab5 - Eb5 .  D5 F#5 A5 D6 . A5 F#5 .  C6 . A5 . F#5 . D5 . ';
   const ch='Gm Gm F F Eb Eb D D  Gm Gm F F Eb D Gm Gm  Cm Cm Gm Gm Ab Ab D D7  Gm Gm F F Eb D Gm Gm';
   return song({key:'G minor',bpm:164},
-    [{w:'square',v:0.045,det:12,vib:8,g:0.85,e:1},a+a2+b+a2],
-    [{w:'sawtooth',v:0.022,g:0.4},musArp(ch,8,'1 . 3 1 . 3 5 .','C4')],
+    [{w:'square',v:0.05,det:12,vib:8,g:0.85,e:1},a+a2+b+a2],
+    [{w:'sawtooth',v:0.026,g:0.4},musArp(ch,8,'1 . 3 1 . 3 5 .','C4')],
     [{w:'sawtooth',v:0.07,g:0.6},musArp(ch,8,'1 . 1 1 1 . 1 1','C2')],
     [{w:'triangle',v:0.22,g:0.7},musArp(ch,8,'1 . . 1 . . 5 .','G2')],
     [{dr:1,v:1},'kh h sh kh h kh sh h '.repeat(7)+'kh kh sh sh kb kb s s']);
@@ -1203,8 +1203,8 @@ SONGS.bonus=(()=>{
   const a2='C#6 . E6 . A5 . C#6 E6  A6 - E6 . C#6 - . .  B5 . E6 . G#5 . B5 E6  G#6 - E6 . B5 - . .  A#5 . C#6 . E6 . C#6 A#5  B5 D#6 F#6 B6 . F#6 D#6 .  E6 . B5 G#5 E5 . G#5 B5  D#6 . B5 . F#5 A5 B5 D#6 ';
   const ch='E E A A E E B B7  A A E E F#7 B E B7';
   return song({key:'E major',bpm:184},
-    [{w:'square',v:0.05,g:0.7,e:1},a+a2],
-    [{w:'triangle',v:0.1,g:0.4},musArp(ch,8,'. 5 . 8 . 5 . 8','A3')],
+    [{w:'square',v:0.06,g:0.7,e:1},a+a2],
+    [{w:'triangle',v:0.12,g:0.4},musArp(ch,8,'. 3 . 5 . 8 . 5','A3')],
     [{w:'triangle',v:0.25,g:0.6},musArp(ch,8,'1 . 8 . 1 . 8 5','E2')],
     [{dr:1,v:0.9},'k h sp h k k sp h '.repeat(7)+'k h sp h sp sp sp sp']);
 })();
@@ -2664,7 +2664,137 @@ function w1l1(){
   return B.L;
 }
 
-defWorld({name:'Sprinkle Shores',theme:'shores',levels:[w1l1]});
+/* 1-2: the piers. Plank walkways over open sea with Snappers leaping between them, and a deep lagoon whose far half
+   can only be reached by diving under a wall. */
+function w1l2(){
+  const B=LevelBuilder(250,'shores');
+  B.room(0,221).room(224,249,0,15,true);
+  B.ground(0,22).ground(60,75).ground(79,126).ground(150,223);
+  B.coins(6,3,3).row(10,5,'?M?').enemy('snippy',15).enemy('blob',19);
+  B.row(23,1,'==========').row(37,1,'==========').row(50,1,'==========');
+  B.sign(21,'Fell in? Swim back up: the sea will not hurt you. The fish might.');
+  B.enemy('snapper',34.5,2,{rise:4}).enemy('snapper',47.5,2,{rise:4.5,phase:0.8});
+  B.coins(26,3,4).arc(32,3,6).row(40,5,'B?B').row(40,8,'===').shard(41,9).enemy('shellby',43).coins(52,3,5).enemy('snippy',55);
+  B.row(63,5,'?B?').enemy('blob',66).pipe(70,2,true).arc(75,4,5);
+  /* the deep lagoon */
+  B.stairs(79,4).ground(83,118,7).clear(87,2,114,6).clear(115,2,117,3).water(87,2,117,6).stairs(119,4,-1);
+  B.sign(84,'Hold {down} to dive. There is a way under the wall.',7);
+  B.fill(100,4,101,9,HARD).coins(89,3,5).coins(96,2,9).coins(104,5,5).coinCol(110,2,3);
+  B.enemy('jelly',93,3.4,{ry:1.2}).enemy('jelly',106,3,{ry:0.8,sp:1.4}).enemy('jelly',112,4.6,{ry:0.9,sp:0.8}).shard(117,2);
+  B.checkpoint(124);
+  B.row(128,1,'====').plat(133,2,3,'x',5,1.2).row(142,1,'======').coins(134,4,6).enemy('snapper',148,2,{rise:3.5});
+  B.row(153,5,'B?B').enemy('snippy',156);
+  B.warp(160,2,'in').enemy('shellby',166).fill(170,2,171,3,HARD);
+  B.row(175,5,'BMB').row(176,9,'?').enemy('blob',178).enemy('blob',180).warp(184,3,'out',true);
+  B.row(188,4,'==').row(191,6,'==').coins(188,5,2).coins(191,7,2).enemy('batty',190,9,{rx:2});
+  B.stairs(196,6).fill(202,2,202,7,HARD);
+  B.goal(208);
+  /* a walled garden at the far end of the pipe: two pillars to kick up between */
+  B.fill(222,2,223,15,GROUND).ground(224,249).fill(224,2,224,15,HARD).fill(249,2,249,15,HARD);
+  B.warp(226,2,'in',true).warp(245,2,'out').fill(234,5,234,12,HARD).fill(238,5,238,12,HARD).coinCol(236,4,6).shard(236,11);
+  B.coins(229,3,3).coins(240,3,3).row(230,5,'?I?').row(240,5,'???');
+  return B.L;
+}
+
+/* 1-3: the stacks. Rock too tall to jump: the way on is up, kicking from wall to wall, and down the other side. */
+function w1l3(){
+  const B=LevelBuilder(236,'shores');
+  B.ground(0,40).ground(45,96).ground(101,150).ground(155,235);
+  B.coins(6,3,3).enemy('blob',12).row(15,5,'B?B').enemy('snippy',20);
+  B.sign(23,'Too high to jump? Kick up between two walls.');
+  B.fill(26,4,26,12,HARD).ground(30,40,9).coinCol(28,3,7);
+  B.row(33,12,'?M?').enemy('snippy',36,9).arc(41,6,5);
+  B.spring(50).row(53,9,'=====').coins(53,10,5).shard(55,13).enemy('batty',60,6);
+  B.row(64,5,'B?B').enemy('shellby',67).pipe(72,3,true);
+  /* a rock with a rock pool on top */
+  B.stairs(76,3).ground(79,96,6).clear(83,3,91,5).water(83,3,91,5).coins(84,3,7).enemy('jelly',87,3.6,{ry:0.7}).row(86,9,'?L?');
+  B.arc(96,7,6);
+  B.checkpoint(104);
+  B.row(108,5,'?B?').enemy('blob',110).enemy('blob',112);
+  /* the big stack: a long chimney, with a shard for those who kick on past the top */
+  B.fill(117,4,117,13,HARD).ground(121,134,10).coinCol(119,3,8).shard(119,13);
+  B.enemy('snippy',125,10).enemy('shellby',130,10).row(127,13,'B?B');
+  B.fill(138,2,139,7,HARD).fill(143,2,144,4,HARD).coins(138,8,2).coins(143,5,2);
+  B.arc(150,4,6).enemy('snapper',152,2,{rise:4});
+  B.row(159,5,'BMB').enemy('blob',162).pipe(166,2).enemy('snippy',171);
+  /* a brick-roofed box hides the third shard: pound down through the roof once big, or look round the back */
+  B.sign(172,'Bricks break under a pound, once Blorp is big. Small? Look round the back.');
+  B.fill(175,2,175,3,HARD).fill(176,2,176,5,HARD).fill(180,4,180,5,HARD).row(177,5,'BBB').row(177,4,'BBB').shard(178,2);
+  B.row(185,5,'?B?').enemy('shellby',188).enemy('batty',192,7,{rx:2});
+  B.stairs(204,6).fill(210,2,210,7,HARD);
+  B.goal(216);
+  return B.L;
+}
+
+/* 1-4: the tide caves. A cliff with the sea inside it: Puffers that swell when Blorp swims near, a gate that only a
+   switch opens, and the first candyfloss. */
+function w1l4(){
+  const B=LevelBuilder(276,'shores');
+  B.room(0,235).room(240,275,0,15,true);
+  B.ground(0,34).ground(38,60).ground(64,150).ground(156,239);
+  B.coins(5,3,3).row(10,5,'?B?').enemy('blob',14).enemy('shellby',18);
+  B.pipe(23,2,true).enemy('snippy',29).arc(34,4,5);
+  B.row(42,5,'BFB').sign(40,'Candyfloss! Jump again in the air, and hold {jump} to glide.').enemy('blob',47);
+  B.row(52,4,'==').row(56,6,'==').coins(52,5,2).coins(56,7,2).shard(66,10);
+  /* the flooded cliff: in at one end, through three chambers under a roof, and out into the open at the other */
+  B.stairs(64,4).ground(68,112,7).fill(75,8,106,11,GROUND).clear(72,2,108,6).water(72,2,108,6).stairs(113,4,-1);
+  B.sign(69,'Puffers swell up when Blorp is near. Give them room.',7);
+  B.fill(84,5,85,6,HARD).fill(84,2,85,2,HARD).fill(96,4,97,6,HARD);
+  B.enemy('puffer',79,4,{rx:2.2}).enemy('puffer',90,3,{rx:2.2,sp:1}).enemy('jelly',101,3.4,{ry:1.2});
+  B.coins(74,3,4).coins(87,5,4).coins(98,2,5);
+  /* a switch hanging in the water, to swim up into, opens the red gate to the last chamber and the second shard */
+  B.row(93,4,'X').coinCol(93,2,2).fill(104,2,104,7,RED).shard(106,3).coinCol(107,3,3);
+  B.checkpoint(118);
+  B.row(122,5,'?B?').enemy('snippy',125).enemy('blob',129).enemy('blob',131);
+  B.pipe(135,3,true).row(140,5,'BMB').row(141,9,'?');
+  B.row(146,3,'==').row(151,1,'===').enemy('snapper',154.5,2,{rise:4.5});
+  B.warp(160,2,'in').enemy('shellby',165).enemy('snippy',169).warp(176,3,'out',true);
+  B.row(181,5,'B?B?B').enemy('blob',183).enemy('batty',187,8,{rx:3}).pipe(191,2);
+  B.spring(196).row(198,9,'====').coins(198,10,4);
+  B.stairs(206,6).fill(212,2,212,7,HARD);
+  B.goal(218);
+  /* a flooded cave at the end of the pipe: a Puffer on guard, a Jelly, and the third shard in the far top corner */
+  B.fill(236,2,239,15,GROUND).ground(240,275).fill(240,2,240,15,HARD).fill(275,2,275,15,HARD).fill(240,11,275,15,GROUND).water(241,2,274,10);
+  B.warp(242,2,'in',true).warp(270,2,'out').coinBox(247,3,252,5).coinBox(258,6,263,8);
+  B.enemy('puffer',256,5,{rx:3,sp:0.9}).enemy('jelly',266,4,{ry:1.6}).row(264,8,'HHH').shard(273,9).fill(269,7,271,7,HARD);
+  return B.L;
+}
+
+/* 1-5: the long beach at dusk. Everything the shore has taught, one thing after another: piers and Snappers, a stack
+   to kick up, a lagoon with a gate, a wide crossing, and a last rock before the flag. */
+function w1l5(){
+  const B=LevelBuilder(304,'shores');
+  B.room(0,267).room(272,303,0,15,true);
+  B.ground(0,30).ground(34,52).ground(72,110).ground(114,160).ground(186,271);
+  B.coins(6,3,3).row(11,5,'?M?').enemy('snippy',15).enemy('blob',19).enemy('blob',21);
+  B.pipe(25,3,true).arc(30,4,5);
+  B.row(38,5,'B?B').enemy('shellby',41).enemy('snippy',46);
+  B.row(53,1,'=====').plat(59,2,3,'x',4,1.3).row(67,1,'=====').enemy('snapper',57.5,2,{rise:4}).enemy('snapper',65.5,2,{rise:4.5,phase:0.7}).coins(54,3,3).coins(68,3,3);
+  /* a stack to kick up; the first shard sits on top of the pillar, a running jump from the rock */
+  B.fill(78,4,78,12,HARD).ground(82,92,9).coinCol(80,3,7).row(85,12,'?F?').enemy('shellby',88,9).shard(78,13);
+  B.row(97,5,'B?B').enemy('blob',99).enemy('blob',101).enemy('snippy',105).arc(110,4,5);
+  B.checkpoint(117);
+  /* the lagoon: two Puffers, and a shelf with the second shard tucked under it */
+  B.stairs(120,4).ground(124,156,7).clear(128,2,152,6).water(128,2,152,6).stairs(157,4,-1);
+  B.fill(140,5,140,6,HARD).fill(140,2,140,2,HARD).fill(147,4,151,4,HARD).shard(150,2);
+  B.enemy('puffer',133,4,{rx:2.4}).enemy('jelly',143,4.6,{ry:0.9}).enemy('puffer',146,2.2,{rx:1.6,sp:1.1}).coins(130,3,4).coins(141,3,4).coins(148,5,3);
+  /* the wide crossing */
+  B.row(161,1,'====').plat(166,2,3,'x',6,1.1).row(176,1,'======').enemy('snapper',164.5,2,{rise:4}).enemy('snapper',183.5,2,{rise:4.5,phase:1}).coins(167,4,7).arc(181,3,6);
+  B.row(189,5,'?B?').enemy('shellby',192).enemy('snippy',196);
+  B.warp(200,2,'in').enemy('blob',206).enemy('blob',208).warp(212,3,'out',true);
+  B.row(217,5,'BMB').row(218,9,'L').enemy('batty',221,8,{rx:2.5});
+  /* the last rock */
+  B.fill(226,4,226,11,HARD).ground(230,236,8).coinCol(228,3,6).row(232,11,'?').enemy('snippy',233,8).fill(237,2,238,5,HARD).fill(239,2,239,3,HARD);
+  B.stairs(244,6).fill(250,2,250,7,HARD);
+  B.goal(256);
+  /* the secret garden: pound the switch, and blue steps lead up to the third shard */
+  B.fill(268,2,271,15,GROUND).ground(272,303).fill(272,2,272,15,HARD).fill(303,2,303,15,HARD);
+  B.warp(274,2,'in',true).warp(298,2,'out').row(279,2,'X').row(283,4,'U').row(286,6,'U').row(289,8,'UU').shard(290,10).coins(283,5,1).coins(286,7,1).coins(289,9,1);
+  B.coinBox(292,3,295,4).row(281,6,'?').sign(277,'Pound the switch from above.');
+  return B.L;
+}
+
+defWorld({name:'Sprinkle Shores',theme:'shores',levels:[w1l1,w1l2,w1l3,w1l4,w1l5]});
 /* ================= World 2: Jellybean Jungle ================= */
 /* PLACEHOLDER: stands in for the real world until it is written, so the map and the checks have all forty levels. */
 THEMES.jungle=Object.assign({},THEMES.shores,{music:'jungle'});
@@ -2962,7 +3092,7 @@ function mapViewBuild(){
 
   /* ---- a few clouds, low over open water where they cover nothing ---- */
   for(const q of [[12.5,2.4,13.6,0.34],[30,2.8,14.6,0.3],[45.5,2.6,14.2,0.26],[14,3,0.8,0.3],[29.5,3,0.4,0.34]]){
-    const b=[]; cloud(b,-2.5,0,-1,R); const m=new T.Mesh(voxGeo(b,q[3]),MAT.glow); m.position.set(q[0],q[1],q[2]); m.userData.x=q[0]; mapRoot.add(m); mapClouds.push(m); }
+    const b=cloudBoxes(R).map(c=>[c[0]-2.5,c[1],c[2]-1,c[3],c[4],c[5],c[6]]); const m=new T.Mesh(voxGeo(b,q[3]),MAT.soft); m.position.set(q[0],q[1],q[2]); m.userData.x=q[0]; mapRoot.add(m); mapClouds.push(m); }
 
   /* ---- the markers: each has a locked, an open and a cleared look, and the boss levels a castle or tower behind ---- */
   MAPNODES.forEach((n,i)=>{

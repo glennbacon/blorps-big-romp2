@@ -76,11 +76,11 @@ const sfx={
   jump(big=false){ tone('square',big?250:330,big?520:680,0.17,0.1); tone('triangle',big?125:165,big?260:340,0.15,0.2); },
   jump2(){ tone('square',520,1040,0.11,0.07); tone('sine',780,1560,0.14,0.14,0.02); auWhoosh('bandpass',1800,4200,0.15,0.3); },
   wallKick(){ tone('square',700,350,0.045,0.1); tone('square',440,900,0.08,0.1,0.04); hiss(0.04,0.12,0,2000); },
-  poundStart(){ tone('triangle',1800,480,0.2,0.24); tone('square',1810,485,0.2,0.03); },
-  poundLand(){ tone('sine',140,38,0.3,0.3); tone('triangle',92,40,0.22,0.28); auWhoosh('lowpass',1400,180,0.28,0.4); hiss(0.05,0.12,0,1200); },
+  poundStart(){ tone('triangle',1800,480,0.2,0.2); tone('square',1810,485,0.2,0.03); },
+  poundLand(){ tone('sine',140,38,0.3,0.26); tone('triangle',92,40,0.22,0.24); auWhoosh('lowpass',1400,180,0.28,0.34); hiss(0.05,0.12,0,1200); },
   glide(){ auWhoosh('bandpass',700,1900,0.4,0.22,0,0.4); },
   puff(){ hiss(0.05,0.05,0,1500); },
-  slide(){ tone('triangle',1400,300,0.7,0.2); tone('sine',2800,600,0.7,0.05); },
+  slide(){ tone('triangle',1400,300,0.7,0.17); tone('sine',2800,600,0.7,0.05); },
   spring(){ tone('sine',220,980,0.28,0.28); tone('square',220,980,0.2,0.05); tone('sine',440,1960,0.2,0.08,0.03); },
   launch(){ tone('sine',170,42,0.4,0.3); tone('sawtooth',110,700,0.4,0.05); auWhoosh('bandpass',300,3200,0.55,0.4,0,0.25); },
   pipe(){ [440,330,247].forEach((f,i)=>{ tone('square',f,f*0.62,0.13,0.1,i*0.16); tone('triangle',f/2,f*0.31,0.13,0.22,i*0.16); }); },
@@ -93,12 +93,12 @@ const sfx={
   sprout(){ jingle('square','C5 E5 G5 C6 E6 G6',0.045,0.09,0.08); jingle('triangle','C4 E4 G4 C5 E5 G5',0.045,0.2,0.08); },
   power(){ jingle('square','G4 C5 E5 G5 C6 E6 G6 C7',0.055,0.1,0.1); jingle('square','E4 G4 C5 E5 G5 C6 E6 G6',0.055,0.05,0.1); },
   oneup(){ jingle('square','E5 G5 E6 C6 D6 G6',0.1,0.11,0.14); jingle('triangle','C4 . G4 . B4 D5',0.1,0.24,0.14); },
-  check(){ jingle('triangle','C5 G5 C6',0.08,0.3,0.16); jingle('square','. . E6',0.08,0.06,0.2); },
+  check(){ jingle('triangle','C5 G5 C6',0.08,0.25,0.16); jingle('square','. . E6',0.08,0.06,0.2); },
   shard(n=1){
     const k=clamp(n|0,1,3)-1;
-    jingle('square',['E6 A6 C#7','E6 A6 C#7 E7','A5 C#6 E6 A6 C#7 E7 . A7'][k],0.06,0.08,0.2+k*0.08);
-    jingle('sine',['E7 A7','E7 A7 C#8','. . E7 A7 C#8 E8 . A8'][k],0.06,0.07,0.25,0.03);
-    if(k===2) jingle('triangle','A3 . E4 . A4 . . A4',0.06,0.26,0.3);
+    jingle('square',['E6 A6 C#7','E6 A6 C#7 E7','A5 C#6 E6 A6 C#7 E7 . A7'][k],0.06,0.07,0.2+k*0.08);
+    jingle('sine',['E7 A7','E7 A7 C#8','. . E7 A7 C#8 E8 . A8'][k],0.06,0.05,0.25,0.03);
+    if(k===2) jingle('triangle','A3 . E4 . A4 . . A4',0.06,0.2,0.3);
   },
   /* --- blocks and gadgets --- */
   bump(){ tone('triangle',170,80,0.11,0.3); tone('square',170,80,0.05,0.04); },
@@ -106,9 +106,9 @@ const sfx={
   crumble(){ auWhoosh('lowpass',900,150,0.4,0.36); tone('triangle',140,60,0.3,0.2); [0.06,0.15,0.26].forEach((d,i)=>tone('square',200-i*40,90,0.05,0.06,d)); },
   switchOn(){ tone('square',330,0,0.04,0.1); tone('square',660,0,0.1,0.1,0.05); hiss(0.02,0.1,0,3000); },
   thud(){ tone('triangle',110,45,0.22,0.3); tone('sine',80,40,0.2,0.25); hiss(0.12,0.12,0,200); },
-  clonk(){ tone('triangle',130,48,0.25,0.3); tone('sine',72,36,0.3,0.28,0.01); tone('square',300,90,0.05,0.09); hiss(0.1,0.16,0,400); },
+  clonk(){ tone('triangle',130,48,0.25,0.26); tone('sine',72,36,0.3,0.24,0.01); tone('square',300,90,0.05,0.09); hiss(0.1,0.16,0,400); },
   fuse(){ hiss(0.25,0.07,0,5000); auWob('square',2200,1700,0.22,0.025,0,43,300); },
-  explode(){ auWhoosh('lowpass',2600,90,0.8,0.4); tone('sine',120,30,0.5,0.3); tone('square',160,40,0.25,0.07); hiss(0.1,0.18,0,800); },
+  explode(){ auWhoosh('lowpass',2600,90,0.8,0.34); tone('sine',120,30,0.5,0.26); tone('square',160,40,0.25,0.07); hiss(0.1,0.18,0,800); },
   rocket(){ auWhoosh('bandpass',400,3400,0.45,0.36,0,0.2); tone('sawtooth',160,520,0.4,0.06); tone('square',900,300,0.06,0.07); },
   zap(){ auWob('sawtooth',1600,220,0.22,0.08,0,70,480); tone('square',2400,300,0.08,0.06); hiss(0.2,0.14,0,3500); },
   /* --- friends and foes --- */
@@ -117,7 +117,7 @@ const sfx={
   fire(){ tone('square',880,280,0.11,0.09); hiss(0.08,0.07,0,2500); },
   spit(){ tone('square',300,640,0.09,0.09); },
   shatter(){ hiss(0.14,0.18,0,2500); tone('square',1500,700,0.08,0.06); tone('sine',3100,1900,0.12,0.06,0.03); },
-  ghost(){ auWob('sine',700,620,0.16,0.22,0,13,40); auWob('sine',880,790,0.16,0.22,0.17,13,50); auWob('sine',620,470,0.32,0.22,0.34,11,45); },
+  ghost(){ auWob('sine',700,620,0.16,0.18,0,13,40); auWob('sine',880,790,0.16,0.18,0.17,13,50); auWob('sine',620,470,0.32,0.18,0.34,11,45); },
   hurt(){ jingle('square','E5 C5 A4 E4 C4',0.07,0.12,0.1); tone('triangle',220,70,0.3,0.2); },
   bossHit(){ tone('sawtooth',300,70,0.3,0.12); tone('triangle',150,50,0.3,0.24); hiss(0.15,0.18,0,300); },
   bossRoar(){ auWob('sawtooth',170,62,0.95,0.1,0,28,34); auWob('square',85,42,0.95,0.06,0,19,13); auWhoosh('lowpass',900,220,0.95,0.36,0,0.2); },
@@ -130,7 +130,7 @@ const sfx={
   /* --- jingles --- */
   die(){ jingle('square','B4 . F5 . F5 E5 D5 C5 . G4 . E4',0.085,0.11,0.14); jingle('triangle','G3 . D3 . D3 . G2 . . C3 . C2',0.085,0.26,0.16); },
   clear(){ jingle('square','G4 C5 E5 G5 C6 E6 G6 . E6 . G6',0.1,0.1,0.2); jingle('square','E4 G4 C5 E5 G5 C6 E6 . C6 . E6',0.1,0.05,0.2); jingle('triangle','C3 . G3 . C4 . G3 . C4 . C3',0.1,0.24,0.2); },
-  over(){ jingle('triangle','C5 . G4 . E4 . A4 B4 A4 Ab4 Bb4 Ab4 G4',0.13,0.28,0.22); jingle('sine','C3 . . . C3 . F3 . . Ab3 . . G3',0.13,0.26,0.4); },
+  over(){ jingle('triangle','C5 . G4 . E4 . A4 B4 A4 Ab4 Bb4 Ab4 G4',0.13,0.25,0.22); jingle('sine','C3 . . . C3 . F3 . . Ab3 . . G3',0.13,0.2,0.4); },
   win(){
     jingle('square','C5 C5 C5 E5 G5 . E5 G5 C6 . C6 E6 G6 . . C7',0.11,0.1,0.24); jingle('square','E4 E4 E4 G4 C5 . C5 E5 G5 . G5 C6 E6 . . G6',0.11,0.05,0.24);
     jingle('triangle','C3 . . C3 G3 . . G3 C4 . . E4 G4 . . C4',0.11,0.24,0.24); hiss(0.3,0.06,1.65,6000);
@@ -298,8 +298,8 @@ SONGS.map=(()=>{
   const a3=h+'C5 . F5 . A5 - C6 A5  D6 - A5 . F5 - D5 .  F5 . D5 . Bb4 - D5 F5  E5 - - . G5 - - . ';
   const ch='F Dm Bb C F Dm Gm C  Bb Bb F F Gm Gm C C7  F Dm Bb C F Dm Bb C';
   return song({key:'F major',bpm:96,sw:0.16},
-    [{w:'triangle',v:0.2,vib:8,s:0.6,e:1},a+b+a3],
-    [{w:'sine',v:0.08,g:0.6},musArp(ch,8,'. 5 8 5 . 5 3^ 5','F3')],
+    [{w:'triangle',v:0.13,vib:8,s:0.6,e:1},a+b+a3],
+    [{w:'sine',v:0.06,g:0.6},musArp(ch,8,'. 5 8 5 . 5 3^ 5','F3')],
     [{w:'triangle',v:0.24,g:0.8},musArp(ch,8,'1 . . 5 1 . 5 .','F2')],
     [{dr:1,v:0.6},'k . r . p . r r']);
 })();
@@ -325,7 +325,7 @@ SONGS.jungle=(()=>{
   const b='B5 - . F#5 B5 - D6 .  C#6 . B5 . F#5 - . .  B5 - . G5 B5 - D6 .  E6 . D6 . B5 - . .  G5 - . E5 G5 - B5 .  A5 . G5 . E5 - G5 .  A5 . C#6 . E6 . C#6 .  G6 . E6 . C#6 A5 G5 E5 ';
   const ch='D D G G D D A A  D D G G D A D D  Bm Bm G G Em Em A A7  D D G G D A D D';
   return song({key:'D major',bpm:144},
-    [{w:'triangle',v:0.12,h:4,g:0.6,e:1},a+a2+b+a2],
+    [{w:'triangle',v:0.13,h:4,g:0.6,e:1},a+a2+b+a2],
     [{w:'square',v:0.022,g:0.35},musArp(ch,8,'. 5 . 3^ . 5 . 3^','G3')],
     [{w:'triangle',v:0.25,g:0.6},musArp(ch,8,'1 . 8 1 . 8 5 .','E2')],
     [{dr:1,v:0.9},'kr . c cr s . b r '.repeat(7)+'kr . c c s b b b']);
@@ -338,10 +338,10 @@ SONGS.deep=(()=>{
     'Eb6 - - D6 C6 -  G5 - - - C6 -  C6 - - Bb5 Ab5 -  Eb5 - - - Ab5 -  F5 - G5 - Ab5 -  C6 - Bb5 - Ab5 -  Bb5 - - - - -  Ab5 - F5 - D5 - ';
   const ch='EbM7 EbM7 Cm7 Cm7 AbM7 AbM7 Bb Bb  EbM7 EbM7 Gm7 Gm7 Ab Bb Eb Eb  AbM7 AbM7 EbM7 EbM7 Fm7 Fm7 Bb Bb  Cm7 Cm7 AbM7 AbM7 Fm7 Fm7 Bb Bb7';
   return song({key:'Eb major',bpm:108,bpb:3,ec:1,fb:0.4},
-    [{w:'sine',v:0.2,vib:10,s:0.7,a:0.03,e:1},a+b],
-    [{w:'triangle',v:0.09,g:0.8,e:1},musArp(ch,6,'1 5 7 3^ 7 5','Ab3')],
-    [{w:'sine',v:0.05,s:0.9,a:0.15,g:1},musArp(ch,6,'5 - - - - -','Ab3')],
-    [{w:'triangle',v:0.24,s:0.5,g:0.95},musArp(ch,6,'1 - - - 5 -','Ab2')],
+    [{w:'sine',v:0.07,vib:10,s:0.7,a:0.03,e:1},a+b],
+    [{w:'triangle',v:0.04,g:0.8,e:1},musArp(ch,6,'1 5 7 3^ 7 5','Ab3')],
+    [{w:'sine',v:0.035,s:0.9,a:0.15,g:1},musArp(ch,6,'5 - - - - -','Ab3')],
+    [{w:'triangle',v:0.2,s:0.5,g:0.95},musArp(ch,6,'1 - - - 5 -','Ab2')],
     [{dr:1,v:0.5},'k . r . r .  k . r . r c']);
 })();
 /* world 4, Spooky Hollow: D minor on tiptoe, with a swing. Short plucked notes that creep past their neighbours, a ghost whistling far above, and a major-key middle so it stays friendly. */
@@ -352,7 +352,7 @@ SONGS.hollow=(()=>{
   const b='C6 - A5 . F5 . A5 .  C6 . C6 D6 C6 - A5 .  Bb5 - G5 . E5 . G5 .  Bb5 . Bb5 C6 Bb5 - G5 .  A5 - G5 . D5 . G5 .  Bb5 . A5 . G5 - D5 .  E5 . G5 . Bb5 . A5 G5  A5 - - . C#6 - - . ';
   const ch='Dm Dm Gm Gm Dm Dm A7 A7  Dm Dm Gm Gm Bb A7 Dm Dm  F F C7 C7 Gm Gm A7 A7  Dm Dm Gm Gm Bb A7 Dm Dm';
   return song({key:'D minor',bpm:116,sw:0.18},
-    [{w:'square',v:0.05,g:0.5,e:1},a+a2+b+a2],
+    [{w:'square',v:0.058,g:0.5,e:1},a+a2+b+a2],
     [{w:'triangle',v:0.11,g:0.35},musArp(ch,8,'. 3 . 5 . 3 . 5','G3')],
     [{w:'sine',v:0.04,vib:18,s:0.9,a:0.12,g:1},musArp(ch,8,'5 - - - - - - -','A4')],
     [{w:'triangle',v:0.25,g:0.5},musArp(ch,8,'1 . 5 . 8 . 5 .','F2')],
@@ -368,8 +368,8 @@ SONGS.works=(()=>{
   const b='F#5 - - A5 D6 - - .  C#6 - D6 - A5 - - .  E5 - - A5 C#6 - - .  B5 - C#6 - A5 - - .  G5 - - B5 E6 - - .  D6 - E6 - B5 - G5 .  A#5 - - C#6 F#6 - - .  E6 - C#6 - A#5 - F#5 . ';
   const ch='Bm Bm G G Em Em F# F#  Bm Bm G G Em F# Bm Bm  D D A A Em Em F# F#7  Bm Bm G G Em F# Bm Bm';
   return song({key:'B minor',bpm:138,spb:4},
-    [{w:'square',v:0.04,det:7,g:0.8,e:1},musX2(a+a2+b+a2)],
-    [{w:'square',v:0.018,g:0.45},musArp(ch,16,'1 5 8 5 3 5 8 5','D3')],
+    [{w:'square',v:0.048,det:7,g:0.8,e:1},musX2(a+a2+b+a2)],
+    [{w:'square',v:0.022,g:0.45},musArp(ch,16,'1 5 8 5 3 5 8 5','D3')],
     [{w:'triangle',v:0.26,g:0.6},musArp(ch,16,'1 . 1 . 8 . 1 . 1 . 1 . 8 . 5 .','E2')],
     [{dr:1,v:0.9},'kt . h . sT . h . kt . h k sT . h h '.repeat(7)+'kt . h . sT . h . kt . s . s s s s']);
 })();
@@ -397,8 +397,8 @@ SONGS.magma=(()=>{
   const b='G5 - - Bb5 Eb6 - - .  D6 - Eb6 - Bb5 - G5 .  F5 - - Bb5 D6 - - .  C6 - D6 - Bb5 - F5 .  Eb5 - - Ab5 C6 - - .  Bb5 - C6 - Ab5 - Eb5 .  D5 . G5 . B5 . D6 .  F6 - D6 - B5 G5 F5 D5 ';
   const ch='Cm Cm Ab Ab Fm Fm G G  Cm Cm Ab Ab Fm G Cm Cm  Eb Eb Bb Bb Ab Ab G G7  Cm Cm Ab Ab Fm G Cm Cm';
   return song({key:'C minor',bpm:168},
-    [{w:'sawtooth',v:0.045,det:10,g:0.8,e:1},a+a2+b+a2],
-    [{w:'square',v:0.02,g:0.4},musArp(ch,8,'8 5 3 5 8 5 3 5','G3')],
+    [{w:'sawtooth',v:0.055,det:10,g:0.8,e:1},a+a2+b+a2],
+    [{w:'square',v:0.024,g:0.4},musArp(ch,8,'8 5 3 5 8 5 3 5','G3')],
     [{w:'sawtooth',v:0.07,g:0.6},musArp(ch,8,'1 1 8 1 1 1 8 1','C2')],
     [{w:'triangle',v:0.2,g:0.9},musArp(ch,8,'1 - - . 1 - . .','G2')],
     [{dr:1,v:1},'k h s h k k s h '.repeat(7)+'k k s s k s s s']);
@@ -412,9 +412,9 @@ SONGS.moon=(()=>{
   const ch='Em Em CM7 CM7 Am Am B7 B7  Em Em CM7 CM7 Am B7 Em Em  G G D D CM7 CM7 B7 B7  Em Em CM7 CM7 Am B7 Em Em';
   return song({key:'E minor',bpm:104,ec:1.5,fb:0.45},
     [{w:'square',v:0.04,det:6,vib:12,s:0.7,a:0.03,e:1},a+a2+b+a2],
-    [{w:'sine',v:0.07,g:0.5,e:1},musArp(ch,8,'1 5 8 9 3^ 9 8 5','G3')],
-    [{w:'sine',v:0.05,s:0.9,a:0.2,g:1},musArp(ch,8,'5 - - - - - - -','E3')],
-    [{w:'triangle',v:0.26,s:0.6,g:0.95},musArp(ch,8,'1 - - - - - 5 -','E2')],
+    [{w:'sine',v:0.055,g:0.5,e:1},musArp(ch,8,'1 5 8 9 3^ 9 8 5','G3')],
+    [{w:'sine',v:0.035,s:0.9,a:0.2,g:1},musArp(ch,8,'5 - - - - - - -','E3')],
+    [{w:'triangle',v:0.2,s:0.6,g:0.95},musArp(ch,8,'1 - - - - - 5 -','E2')],
     [{dr:1,v:0.7},'k . h . . . h .  k . h . s . h h']);
 })();
 /* boss fights: G minor at a gallop. The harmony steps down G minor, F, E flat, D like a closing trap; the middle section swerves to A flat for drama. */
@@ -425,8 +425,8 @@ SONGS.boss=(()=>{
   const b='C6 - - Eb6 G6 - - .  F6 - Eb6 - C6 - G5 .  Bb5 - - D6 G6 - - .  F6 - D6 - Bb5 - G5 .  Ab5 - - C6 Eb6 - - .  D6 - C6 - Ab5 - Eb5 .  D5 F#5 A5 D6 . A5 F#5 .  C6 . A5 . F#5 . D5 . ';
   const ch='Gm Gm F F Eb Eb D D  Gm Gm F F Eb D Gm Gm  Cm Cm Gm Gm Ab Ab D D7  Gm Gm F F Eb D Gm Gm';
   return song({key:'G minor',bpm:164},
-    [{w:'square',v:0.045,det:12,vib:8,g:0.85,e:1},a+a2+b+a2],
-    [{w:'sawtooth',v:0.022,g:0.4},musArp(ch,8,'1 . 3 1 . 3 5 .','C4')],
+    [{w:'square',v:0.05,det:12,vib:8,g:0.85,e:1},a+a2+b+a2],
+    [{w:'sawtooth',v:0.026,g:0.4},musArp(ch,8,'1 . 3 1 . 3 5 .','C4')],
     [{w:'sawtooth',v:0.07,g:0.6},musArp(ch,8,'1 . 1 1 1 . 1 1','C2')],
     [{w:'triangle',v:0.22,g:0.7},musArp(ch,8,'1 . . 1 . . 5 .','G2')],
     [{dr:1,v:1},'kh h sh kh h kh sh h '.repeat(7)+'kh kh sh sh kb kb s s']);
@@ -437,8 +437,8 @@ SONGS.bonus=(()=>{
   const a2='C#6 . E6 . A5 . C#6 E6  A6 - E6 . C#6 - . .  B5 . E6 . G#5 . B5 E6  G#6 - E6 . B5 - . .  A#5 . C#6 . E6 . C#6 A#5  B5 D#6 F#6 B6 . F#6 D#6 .  E6 . B5 G#5 E5 . G#5 B5  D#6 . B5 . F#5 A5 B5 D#6 ';
   const ch='E E A A E E B B7  A A E E F#7 B E B7';
   return song({key:'E major',bpm:184},
-    [{w:'square',v:0.05,g:0.7,e:1},a+a2],
-    [{w:'triangle',v:0.1,g:0.4},musArp(ch,8,'. 5 . 8 . 5 . 8','A3')],
+    [{w:'square',v:0.06,g:0.7,e:1},a+a2],
+    [{w:'triangle',v:0.12,g:0.4},musArp(ch,8,'. 3 . 5 . 8 . 5','A3')],
     [{w:'triangle',v:0.25,g:0.6},musArp(ch,8,'1 . 8 . 1 . 8 5','E2')],
     [{dr:1,v:0.9},'k h sp h k k sp h '.repeat(7)+'k h sp h sp sp sp sp']);
 })();

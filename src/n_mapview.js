@@ -114,7 +114,7 @@ function mapViewBuild(){
 
   /* ---- a few clouds, low over open water where they cover nothing ---- */
   for(const q of [[12.5,2.4,13.6,0.34],[30,2.8,14.6,0.3],[45.5,2.6,14.2,0.26],[14,3,0.8,0.3],[29.5,3,0.4,0.34]]){
-    const b=[]; cloud(b,-2.5,0,-1,R); const m=new T.Mesh(voxGeo(b,q[3]),MAT.glow); m.position.set(q[0],q[1],q[2]); m.userData.x=q[0]; mapRoot.add(m); mapClouds.push(m); }
+    const b=cloudBoxes(R).map(c=>[c[0]-2.5,c[1],c[2]-1,c[3],c[4],c[5],c[6]]); const m=new T.Mesh(voxGeo(b,q[3]),MAT.soft); m.position.set(q[0],q[1],q[2]); m.userData.x=q[0]; mapRoot.add(m); mapClouds.push(m); }
 
   /* ---- the markers: each has a locked, an open and a cleared look, and the boss levels a castle or tower behind ---- */
   MAPNODES.forEach((n,i)=>{

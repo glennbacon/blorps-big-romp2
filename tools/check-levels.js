@@ -206,7 +206,7 @@ function harness(){
       onFloor(e.type,e.x,e.y);
     }
     for(const k of L0.contents.keys()){ const id=t[k]; if(id!==BRICK&&id!==QBLOCK&&id!==HIDDEN) out.push('block contents at '+(k%W0)+','+Math.floor(k/W0)+' have no block'); }
-    for(let x=0;x<W0;x++) for(let y=0;y<2;y++){ const id=at(x,y); if(id!==AIR&&id!==GROUND&&id!==ICE&&id!==CONV_L&&id!==CONV_R) out.push('tile '+id+' at '+x+','+y+' is below the walking surface'); }
+    for(let x=0;x<W0;x++) for(let y=0;y<2;y++){ const id=at(x,y); if(id!==AIR&&id!==GROUND&&id!==ICE&&id!==CONV_L&&id!==CONV_R&&!(id===SEMI&&y===1)) out.push('tile '+id+' at '+x+','+y+' is below the walking surface'); }
     if(L0.shards.length!==3) out.push('level has '+L0.shards.length+' moon shards, not 3');
     for(const s of L0.shards) if(sol(Math.floor(s.x),Math.floor(s.y))) out.push('shard at '+s.x+','+s.y+' is inside a solid tile');
     const tags={}; for(const w of L0.warps) (tags[w.tag]=tags[w.tag]||[]).push(w);

@@ -119,4 +119,134 @@ function w1l1(){
   return B.L;
 }
 
-defWorld({name:'Sprinkle Shores',theme:'shores',levels:[w1l1]});
+/* 1-2: the piers. Plank walkways over open sea with Snappers leaping between them, and a deep lagoon whose far half
+   can only be reached by diving under a wall. */
+function w1l2(){
+  const B=LevelBuilder(250,'shores');
+  B.room(0,221).room(224,249,0,15,true);
+  B.ground(0,22).ground(60,75).ground(79,126).ground(150,223);
+  B.coins(6,3,3).row(10,5,'?M?').enemy('snippy',15).enemy('blob',19);
+  B.row(23,1,'==========').row(37,1,'==========').row(50,1,'==========');
+  B.sign(21,'Fell in? Swim back up: the sea will not hurt you. The fish might.');
+  B.enemy('snapper',34.5,2,{rise:4}).enemy('snapper',47.5,2,{rise:4.5,phase:0.8});
+  B.coins(26,3,4).arc(32,3,6).row(40,5,'B?B').row(40,8,'===').shard(41,9).enemy('shellby',43).coins(52,3,5).enemy('snippy',55);
+  B.row(63,5,'?B?').enemy('blob',66).pipe(70,2,true).arc(75,4,5);
+  /* the deep lagoon */
+  B.stairs(79,4).ground(83,118,7).clear(87,2,114,6).clear(115,2,117,3).water(87,2,117,6).stairs(119,4,-1);
+  B.sign(84,'Hold {down} to dive. There is a way under the wall.',7);
+  B.fill(100,4,101,9,HARD).coins(89,3,5).coins(96,2,9).coins(104,5,5).coinCol(110,2,3);
+  B.enemy('jelly',93,3.4,{ry:1.2}).enemy('jelly',106,3,{ry:0.8,sp:1.4}).enemy('jelly',112,4.6,{ry:0.9,sp:0.8}).shard(117,2);
+  B.checkpoint(124);
+  B.row(128,1,'====').plat(133,2,3,'x',5,1.2).row(142,1,'======').coins(134,4,6).enemy('snapper',148,2,{rise:3.5});
+  B.row(153,5,'B?B').enemy('snippy',156);
+  B.warp(160,2,'in').enemy('shellby',166).fill(170,2,171,3,HARD);
+  B.row(175,5,'BMB').row(176,9,'?').enemy('blob',178).enemy('blob',180).warp(184,3,'out',true);
+  B.row(188,4,'==').row(191,6,'==').coins(188,5,2).coins(191,7,2).enemy('batty',190,9,{rx:2});
+  B.stairs(196,6).fill(202,2,202,7,HARD);
+  B.goal(208);
+  /* a walled garden at the far end of the pipe: two pillars to kick up between */
+  B.fill(222,2,223,15,GROUND).ground(224,249).fill(224,2,224,15,HARD).fill(249,2,249,15,HARD);
+  B.warp(226,2,'in',true).warp(245,2,'out').fill(234,5,234,12,HARD).fill(238,5,238,12,HARD).coinCol(236,4,6).shard(236,11);
+  B.coins(229,3,3).coins(240,3,3).row(230,5,'?I?').row(240,5,'???');
+  return B.L;
+}
+
+/* 1-3: the stacks. Rock too tall to jump: the way on is up, kicking from wall to wall, and down the other side. */
+function w1l3(){
+  const B=LevelBuilder(236,'shores');
+  B.ground(0,40).ground(45,96).ground(101,150).ground(155,235);
+  B.coins(6,3,3).enemy('blob',12).row(15,5,'B?B').enemy('snippy',20);
+  B.sign(23,'Too high to jump? Kick up between two walls.');
+  B.fill(26,4,26,12,HARD).ground(30,40,9).coinCol(28,3,7);
+  B.row(33,12,'?M?').enemy('snippy',36,9).arc(41,6,5);
+  B.spring(50).row(53,9,'=====').coins(53,10,5).shard(55,13).enemy('batty',60,6);
+  B.row(64,5,'B?B').enemy('shellby',67).pipe(72,3,true);
+  /* a rock with a rock pool on top */
+  B.stairs(76,3).ground(79,96,6).clear(83,3,91,5).water(83,3,91,5).coins(84,3,7).enemy('jelly',87,3.6,{ry:0.7}).row(86,9,'?L?');
+  B.arc(96,7,6);
+  B.checkpoint(104);
+  B.row(108,5,'?B?').enemy('blob',110).enemy('blob',112);
+  /* the big stack: a long chimney, with a shard for those who kick on past the top */
+  B.fill(117,4,117,13,HARD).ground(121,134,10).coinCol(119,3,8).shard(119,13);
+  B.enemy('snippy',125,10).enemy('shellby',130,10).row(127,13,'B?B');
+  B.fill(138,2,139,7,HARD).fill(143,2,144,4,HARD).coins(138,8,2).coins(143,5,2);
+  B.arc(150,4,6).enemy('snapper',152,2,{rise:4});
+  B.row(159,5,'BMB').enemy('blob',162).pipe(166,2).enemy('snippy',171);
+  /* a brick-roofed box hides the third shard: pound down through the roof once big, or look round the back */
+  B.sign(172,'Bricks break under a pound, once Blorp is big. Small? Look round the back.');
+  B.fill(175,2,175,3,HARD).fill(176,2,176,5,HARD).fill(180,4,180,5,HARD).row(177,5,'BBB').row(177,4,'BBB').shard(178,2);
+  B.row(185,5,'?B?').enemy('shellby',188).enemy('batty',192,7,{rx:2});
+  B.stairs(204,6).fill(210,2,210,7,HARD);
+  B.goal(216);
+  return B.L;
+}
+
+/* 1-4: the tide caves. A cliff with the sea inside it: Puffers that swell when Blorp swims near, a gate that only a
+   switch opens, and the first candyfloss. */
+function w1l4(){
+  const B=LevelBuilder(276,'shores');
+  B.room(0,235).room(240,275,0,15,true);
+  B.ground(0,34).ground(38,60).ground(64,150).ground(156,239);
+  B.coins(5,3,3).row(10,5,'?B?').enemy('blob',14).enemy('shellby',18);
+  B.pipe(23,2,true).enemy('snippy',29).arc(34,4,5);
+  B.row(42,5,'BFB').sign(40,'Candyfloss! Jump again in the air, and hold {jump} to glide.').enemy('blob',47);
+  B.row(52,4,'==').row(56,6,'==').coins(52,5,2).coins(56,7,2).shard(66,10);
+  /* the flooded cliff: in at one end, through three chambers under a roof, and out into the open at the other */
+  B.stairs(64,4).ground(68,112,7).fill(75,8,106,11,GROUND).clear(72,2,108,6).water(72,2,108,6).stairs(113,4,-1);
+  B.sign(69,'Puffers swell up when Blorp is near. Give them room.',7);
+  B.fill(84,5,85,6,HARD).fill(84,2,85,2,HARD).fill(96,4,97,6,HARD);
+  B.enemy('puffer',79,4,{rx:2.2}).enemy('puffer',90,3,{rx:2.2,sp:1}).enemy('jelly',101,3.4,{ry:1.2});
+  B.coins(74,3,4).coins(87,5,4).coins(98,2,5);
+  /* a switch hanging in the water, to swim up into, opens the red gate to the last chamber and the second shard */
+  B.row(93,4,'X').coinCol(93,2,2).fill(104,2,104,7,RED).shard(106,3).coinCol(107,3,3);
+  B.checkpoint(118);
+  B.row(122,5,'?B?').enemy('snippy',125).enemy('blob',129).enemy('blob',131);
+  B.pipe(135,3,true).row(140,5,'BMB').row(141,9,'?');
+  B.row(146,3,'==').row(151,1,'===').enemy('snapper',154.5,2,{rise:4.5});
+  B.warp(160,2,'in').enemy('shellby',165).enemy('snippy',169).warp(176,3,'out',true);
+  B.row(181,5,'B?B?B').enemy('blob',183).enemy('batty',187,8,{rx:3}).pipe(191,2);
+  B.spring(196).row(198,9,'====').coins(198,10,4);
+  B.stairs(206,6).fill(212,2,212,7,HARD);
+  B.goal(218);
+  /* a flooded cave at the end of the pipe: a Puffer on guard, a Jelly, and the third shard in the far top corner */
+  B.fill(236,2,239,15,GROUND).ground(240,275).fill(240,2,240,15,HARD).fill(275,2,275,15,HARD).fill(240,11,275,15,GROUND).water(241,2,274,10);
+  B.warp(242,2,'in',true).warp(270,2,'out').coinBox(247,3,252,5).coinBox(258,6,263,8);
+  B.enemy('puffer',256,5,{rx:3,sp:0.9}).enemy('jelly',266,4,{ry:1.6}).row(264,8,'HHH').shard(273,9).fill(269,7,271,7,HARD);
+  return B.L;
+}
+
+/* 1-5: the long beach at dusk. Everything the shore has taught, one thing after another: piers and Snappers, a stack
+   to kick up, a lagoon with a gate, a wide crossing, and a last rock before the flag. */
+function w1l5(){
+  const B=LevelBuilder(304,'shores');
+  B.room(0,267).room(272,303,0,15,true);
+  B.ground(0,30).ground(34,52).ground(72,110).ground(114,160).ground(186,271);
+  B.coins(6,3,3).row(11,5,'?M?').enemy('snippy',15).enemy('blob',19).enemy('blob',21);
+  B.pipe(25,3,true).arc(30,4,5);
+  B.row(38,5,'B?B').enemy('shellby',41).enemy('snippy',46);
+  B.row(53,1,'=====').plat(59,2,3,'x',4,1.3).row(67,1,'=====').enemy('snapper',57.5,2,{rise:4}).enemy('snapper',65.5,2,{rise:4.5,phase:0.7}).coins(54,3,3).coins(68,3,3);
+  /* a stack to kick up; the first shard sits on top of the pillar, a running jump from the rock */
+  B.fill(78,4,78,12,HARD).ground(82,92,9).coinCol(80,3,7).row(85,12,'?F?').enemy('shellby',88,9).shard(78,13);
+  B.row(97,5,'B?B').enemy('blob',99).enemy('blob',101).enemy('snippy',105).arc(110,4,5);
+  B.checkpoint(117);
+  /* the lagoon: two Puffers, and a shelf with the second shard tucked under it */
+  B.stairs(120,4).ground(124,156,7).clear(128,2,152,6).water(128,2,152,6).stairs(157,4,-1);
+  B.fill(140,5,140,6,HARD).fill(140,2,140,2,HARD).fill(147,4,151,4,HARD).shard(150,2);
+  B.enemy('puffer',133,4,{rx:2.4}).enemy('jelly',143,4.6,{ry:0.9}).enemy('puffer',146,2.2,{rx:1.6,sp:1.1}).coins(130,3,4).coins(141,3,4).coins(148,5,3);
+  /* the wide crossing */
+  B.row(161,1,'====').plat(166,2,3,'x',6,1.1).row(176,1,'======').enemy('snapper',164.5,2,{rise:4}).enemy('snapper',183.5,2,{rise:4.5,phase:1}).coins(167,4,7).arc(181,3,6);
+  B.row(189,5,'?B?').enemy('shellby',192).enemy('snippy',196);
+  B.warp(200,2,'in').enemy('blob',206).enemy('blob',208).warp(212,3,'out',true);
+  B.row(217,5,'BMB').row(218,9,'L').enemy('batty',221,8,{rx:2.5});
+  /* the last rock */
+  B.fill(226,4,226,11,HARD).ground(230,236,8).coinCol(228,3,6).row(232,11,'?').enemy('snippy',233,8).fill(237,2,238,5,HARD).fill(239,2,239,3,HARD);
+  B.stairs(244,6).fill(250,2,250,7,HARD);
+  B.goal(256);
+  /* the secret garden: pound the switch, and blue steps lead up to the third shard */
+  B.fill(268,2,271,15,GROUND).ground(272,303).fill(272,2,272,15,HARD).fill(303,2,303,15,HARD);
+  B.warp(274,2,'in',true).warp(298,2,'out').row(279,2,'X').row(283,4,'U').row(286,6,'U').row(289,8,'UU').shard(290,10).coins(283,5,1).coins(286,7,1).coins(289,9,1);
+  B.coinBox(292,3,295,4).row(281,6,'?').sign(277,'Pound the switch from above.');
+  return B.L;
+}
+
+defWorld({name:'Sprinkle Shores',theme:'shores',levels:[w1l1,w1l2,w1l3,w1l4,w1l5]});
