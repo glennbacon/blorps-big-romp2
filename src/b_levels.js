@@ -68,8 +68,9 @@ function LevelBuilder(W,theme,H){
     liquid(y){ L.liquidY=y; return B; },
     /* one of the level's three moon shards. `needs` names a power-up without which it cannot be reached ('fluff' or 'fire'). */
     shard(x,y,needs){ L.shards.push({x:x+0.5,y:y+0.5,needs:needs||null}); return B; },
-    /* A part of the level the camera stays inside. The first room is the one the level starts in; with none, the whole level is one room. */
-    room(x0,x1,y0,y1){ L.rooms.push({x0,x1:x1+1,y0:y0||0,y1:y1===undefined?H:y1+1}); return B; },
+    /* A part of the level the camera stays inside. The first room is the one the level starts in; with none, the whole
+       level is one room. A `bonus` room plays the bonus tune. */
+    room(x0,x1,y0,y1,bonus){ L.rooms.push({x0,x1:x1+1,y0:y0||0,y1:y1===undefined?H:y1+1,bonus:!!bonus}); return B; },
     /* a launch pod at a tile, aimed `ang` degrees from straight up (positive leans right), firing at `power` tiles a second */
     pod(x,y,ang,power){ L.pods.push({x:x+0.5,y:y+0.5,ang:(ang||0)*Math.PI/180,power:power||24}); return B; },
     /* moving air: a box, and the push it gives in tiles per second squared. A fan is drawn under an updraft. */
@@ -83,11 +84,14 @@ function LevelBuilder(W,theme,H){
     conveyor(x0,x1,y,dir){ return B.fill(x0,y,x1,y,dir<0?CONV_L:CONV_R); },
     checkpoint(x,y){ L.checkpoint={x:x+0.5,y:y||2}; return B; },
     start(x,y){ L.start={x:x+0.5,y:y||2}; return B; },
-    goal(x){ set(x,2,HARD); L.goal={x}; return B; },
+    /* the flagpole, standing on a hard block at height y (the ground, unless said); it needs 18 tiles of floor after it for the hut */
+    goal(x,y){ y=y||2; set(x,y,HARD); L.goal={x,y}; return B; },
     /* a boss arena: where the boss starts, how far left and right it may go, its hit points, and which boss */
     boss(x,x0,x1,hp,kind){ L.boss={x,y:2,x0,x1,hp:hp||9,kind:kind||'grump'}; return B; },
     /* which of the theme's five looks (sky and light) to use, when not the one that goes with the level's place in its world */
-    look(i){ L.look=i; return B; }
+    look(i){ L.look=i; return B; },
+    /* anything else a theme's scenery wants to know about this level, read back as S.L[key] */
+    set(key,value){ L[key]=value; return B; }
   };
   return B;
 }

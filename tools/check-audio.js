@@ -37,7 +37,7 @@ function makeEnv(opt={}){
       return this.add('exp',v,t);
     }
     setTargetAtTime(v,t,tc){ num(tc,this.name+' time constant'); if(tc<0) throw new Error(this.name+' time constant is negative'); return this.add('tgt',v,t,tc); }
-    cancelScheduledValues(t){ time(t,this.name+'.cancelScheduledValues time'); this.v0=this.valueAt(t); this.ev=this.ev.filter(e=>e.t<t).map(e=>e.k==='tgt'?e:{k:'set',v:e.v,t:e.t}); const l=this.ev[this.ev.length-1]; if(!l||l.k!=='tgt'){ this.ev=[]; } return this; }
+    cancelScheduledValues(t){ time(t,this.name+'.cancelScheduledValues time'); this.ev=this.ev.filter(e=>e.t<t); return this; }
     valueAt(t){
       let v=this.v0, pt=0, tg=null; const settle=at=>tg.v+(v-tg.v)*Math.exp(-(at-tg.t)/Math.max(tg.tc,1e-9));
       for(const e of this.ev){
@@ -87,7 +87,7 @@ function makeEnv(opt={}){
   env.setInterval=(fn,ms)=>{ if(typeof fn!=='function') throw new Error('setInterval without a function'); env.timers.set(++env.tid,{fn,ms}); return env.tid; };
   env.clearInterval=id=>{ env.timers.delete(id); };
   env.advance=dt=>{ env.now+=dt; for(const t of [...env.timers.values()]) t.fn(); };
-  env.next=(node,kind)=>{ const seen=new Set(), q=[node]; while(q.length){ const n=q.shift(); if(seen.has(n)) continue; seen.add(n); if(n!==node&&n.kind===kind) return n; for(const o of n.outs) q.push(o instanceof Param?o.owner:o); } return null; };
+  env.isNode=x=>x instanceof Node;
   env.reaches=(node,goal,avoid)=>{ const seen=new Set(), q=[node]; while(q.length){ const n=q.shift(); if(seen.has(n)||n===avoid) continue; seen.add(n); if(n===goal) return true; for(const o of n.outs) q.push(o instanceof Param?o.owner:o); } return false; };
   return env;
 }
@@ -117,14 +117,18 @@ function checkNodes(env,what){
 }
 /* a rough loudness figure: the peak of the summed envelopes, weighted by how piercing each kind of source is */
 function loudness(env,from){
-  const src=env.nodes.filter(n=>(n.kind==='osc'||n.kind==='source')&&n.t0!==undefined&&n.born>=from&&!(n.outs[0] instanceof env.nodes[0].constructor===false)).map(n=>{
-    const g=env.next(n,'gain'), f=n.kind==='source'?env.next(n,'filter'):null; if(!g) return null;
+  const list=[];
+  for(const n of env.nodes){
+    if((n.kind!=='osc'&&n.kind!=='source')||n.t0===undefined||n.born<from) continue;
+    let f=null, g=n; while(g&&g.kind!=='gain'){ if(g.kind==='filter') f=g; g=g.outs.find(env.isNode); }
+    const after=g&&g.outs.find(env.isNode); if(!after) continue;   /* a wobble oscillator only steers a pitch; it makes no sound itself */
+    if(!f&&after.kind==='filter') f=after;
     let w=n.kind==='source'?(f?(f.type==='highpass'?0.55:0.3):0.6):({square:1,sawtooth:0.85,triangle:0.42,sine:0.4})[n.type];
     if(n.kind==='osc'&&n.frequency.valueAt(n.t0)<200) w*=0.6;
-    return {n,g,w};
-  }).filter(Boolean);
-  let peak=0, end=from; for(const s of src) end=Math.max(end,s.n.t1||from);
-  for(let t=from;t<=end;t+=0.004){ let sum=0; for(const s of src) if(t>=s.n.t0&&t<=s.n.t1) sum+=s.w*Math.abs(s.g.gain.valueAt(t)); if(sum>peak) peak=sum; }
+    list.push({n,g,w});
+  }
+  let peak=0, end=from; for(const s of list) end=Math.max(end,s.n.t1||from);
+  for(let t=from;t<=end;t+=0.004){ let sum=0; for(const s of list) if(t>=s.n.t0&&t<=s.n.t1) sum+=s.w*Math.abs(s.g.gain.valueAt(t)); if(sum>peak) peak=sum; }
   return {peak,len:end-from};
 }
 
@@ -199,11 +203,11 @@ attempt('musicMuffle',()=>{
   A.musicMuffle(true); env.now+=0.5; muffle=env.nodes.find(n=>n.kind==='filter'&&n.type==='lowpass'&&n.frequency.value>500&&n.frequency.value<900);
   if(!muffle) return fail('musicMuffle(true) closed no low-pass filter to about 700 Hz');
   A.musicMuffle(false); env.now+=0.35; if(!(muffle.frequency.value>8000)) fail('musicMuffle(false) has not opened the filter after 0.35 s ('+muffle.frequency.value.toFixed(0)+' Hz)');
-  env.now+=1; A.sfx.coin(); const o=env.nodes[env.nodes.length-1]; if(!env.reaches(env.nodes.filter(n=>n.kind==='osc').pop(),out,muffle)) fail('sound effects pass through the underwater filter; only music should');
+  env.now+=1; A.sfx.coin(); if(!env.reaches(env.nodes.filter(n=>n.kind==='osc').pop(),out,muffle)) fail('sound effects pass through the underwater filter; only music should');
 });
 attempt('musicDuck',()=>{
   const gains=env.nodes.filter(n=>n.kind==='gain'), before=gains.map(n=>n.gain.ev.length); A.musicDuck(1);
-  const dk=gains.find((n,i)=>n.gain.ev.length!==before[i]||n.gain.valueAt(env.now+0.3)<0.5&&n.gain.valueAt(env.now)>0.9); if(!dk) return fail('musicDuck changed no gain');
+  const dk=gains.find((n,i)=>n.gain.ev.length!==before[i]); if(!dk) return fail('musicDuck changed no gain');
   const lo=dk.gain.valueAt(env.now+0.4), hi=dk.gain.valueAt(env.now+2); if(lo<0.25||lo>0.45) fail('musicDuck drops the music to '+lo.toFixed(2)+', expected about 0.35'); if(hi<0.9) fail('musicDuck has not brought the music back a second later ('+hi.toFixed(2)+')');
   A.musicDuck(); A.musicDuck(0); A.musicDuck(NaN); A.musicDuck(-1); env.now+=12; if(dk.gain.value<0.95) fail('the music stays ducked after odd musicDuck arguments');
 });
@@ -228,24 +232,24 @@ for(const name of Object.keys(A.SONGS)){
       else if(!(n.f>=30&&n.f<=5000)||!(n.d>=1)) bad('track '+i+' step '+j+': bad note (f='+n.f+', d='+n.d+')'); });
     if(!t.ins.dr&&(!(t.ins.v>0&&t.ins.v<=0.4)||!['sine','square','sawtooth','triangle'].includes(t.ins.w))) bad('track '+i+' has a bad instrument');
   });
-  const secs=s.len*60/s.bpm/s.spb, mark=env.nodes.length; let ticks=0, poly=0;
+  const secs=s.len*60/s.bpm/s.spb, mark=env.nodes.length, began=env.now; let ticks=0, poly=0;
   attempt('playing '+name,()=>{
     A.musicStart(name); if(env.timers.size!==1) bad('musicStart left '+env.timers.size+' timers running');
     const want=2*s.len+s.bar;
-    while(A.mus?A.mus.step<want:env.now<mark+2.2*secs){
+    while(A.mus?A.mus.step<want:env.now<began+2.2*secs+10){
       if(++ticks>200000) throw new Error('the song never reached its second loop');
       /* mostly a steady 40 ms tick, now and then a stall like a busy phone, plus every control the game uses */
       env.advance(ticks%151===0?0.4:ticks%7===0?0.055:0.04);
       if(ticks===200) A.musicRate(1.35); if(ticks===500) A.musicRate(1.12); if(ticks===800) A.musicRate(1);
       if(ticks===300){ A.musicPause(true); for(let i=0;i<10;i++) env.advance(0.04); A.musicPause(false); }
-      if(ticks===350){ A.musicMuffle(true); A.musicDuck(0.8); A.sfx.coin(3); } if(ticks===420) A.musicMuffle(false);
+      if(ticks===350){ A.musicMuffle(true); A.musicDuck(0.8); } if(ticks===420) A.musicMuffle(false);
       if(ticks===450){ A.setMuted(true); for(let i=0;i<10;i++) env.advance(0.04); A.setMuted(false); }
     }
     const notes=env.nodes.slice(mark).filter(n=>n.kind==='osc'||n.kind==='source');
     if(!notes.length) bad('scheduled no notes');
     /* peak polyphony, and proof that music (unlike effects) runs through the underwater filter */
     const edges=[]; for(const n of notes){ edges.push([n.t0,1],[n.t1,-1]); } edges.sort((a,b)=>a[0]-b[0]||a[1]-b[1]); let cur=0; for(const e of edges){ cur+=e[1]; if(cur>poly) poly=cur; }
-    if(muffle&&notes.some(n=>n.born<env.now-secs&&env.reaches(n,out,muffle)&&!env.reaches(n,env.nodes.find(x=>x.kind==='comp'),muffle)===false&&env.next(n,'gain')&&A.AU.sg!==undefined&&!env.reaches(n,A.AU.sg||out)&&env.reaches(n,out,muffle))) bad('some music bypasses the underwater filter');
+    if(muffle&&notes.some(n=>env.reaches(n,out,muffle))) bad('some music bypasses the underwater filter');
     A.musicStop(); if(env.timers.size) bad('musicStop left a timer running');
     const made=env.made; for(let i=0;i<20;i++) env.advance(0.04); if(env.made!==made) bad('notes were scheduled after musicStop');
   });

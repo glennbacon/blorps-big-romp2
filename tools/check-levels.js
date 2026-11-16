@@ -128,7 +128,7 @@ function harness(){
     seed=1; botSeed=sd||1; nerf=margin||1; start(idx,form);
     const shardRun=target!=='goal', boss=!shardRun&&L.boss;
     if(shardRun&&!shards[target]) return {ok:false,rolls:0,cells:0,why:'no such shard'};
-    const tgt=shardRun?[shards[target].x,shards[target].y]:L.goal?[L.goal.x-1,3]:[L.boss.x,3];
+    const tgt=shardRun?[shards[target].x,shards[target].y]:L.goal?[L.goal.x-1,L.goal.y+1]:[L.boss.x,3];
     const dist=field(Math.floor(tgt[0]),Math.floor(tgt[1]));
     const done=()=>shardRun?shards[target].got:!!(player.goal||G.bossDead);
     const cells=new Map(), list=[]; let front=[], best=1e9, rolls=0;
@@ -168,10 +168,10 @@ function harness(){
     for(const form of [0,1]){
       start(idx,form); if(!L.goal) return out;
       enemies=[]; /* this is about the roof, not about who is flying under it */
-      const gx=L.goal.x, base=snap(); let hit=null;
+      const gx=L.goal.x, gy=L.goal.y, base=snap(); let hit=null;
       for(let x=gx-12;x<gx&&!hit;x++){
         let top=-1; for(let y=0;y<H;y++){ if(solidAt(x,y)) top=y; else if(top>=0) break; }
-        if(top<2) continue; /* level ground, not a step */
+        if(top<gy) continue; /* level ground, not a step */
         for(const vx of [0,5.5,RUN_MAX]){
           restore(base); player.x=x+0.5; player.y=top+1; player.vx=vx; player.vy=0; player.onGround=true;
           input.left=false; input.right=input.run=input.jump=true; input.jumpBuf=0.11; knocks=[];
@@ -214,9 +214,9 @@ function harness(){
     const r0=L0.rooms[0], inRoom=(x,r)=>x>=r.x0&&x<r.x1;
     if(!inRoom(L0.start.x,r0)) out.push('the start is outside the first room');
     for(const r of L0.rooms) if(r.x1-r.x0<24) out.push('room from x '+r.x0+' is narrower than the screen (needs 24 tiles)');
-    if(L0.goal){ const gx=L0.goal.x;
+    if(L0.goal){ const gx=L0.goal.x, gy=L0.goal.y;
       if(!inRoom(gx,r0)||r0.x1<gx+10) out.push('the first room is too narrow for the hut after the flag (needs to reach x '+(gx+10)+')');
-      for(let x=gx-1;x<=gx+8;x++){ if(!sol(x,1)) out.push('no ground at x '+x+' around the flag'); for(let y=2;y<12;y++) if(at(x,y)!==AIR&&!(x===gx&&y===2)) out.push('tile in the way at '+x+','+y+' around the flag'); } }
+      for(let x=gx-1;x<=gx+8;x++){ if(!sol(x,gy-1)) out.push('no ground at x '+x+' around the flag'); for(let y=gy;y<Math.min(H0,gy+10);y++) if(at(x,y)!==AIR&&!(x===gx&&y===gy)) out.push('tile in the way at '+x+','+y+' around the flag'); } }
     else if(!L0.boss) out.push('level has neither a flag nor a boss');
     for(const n of headroom(idx)) out.push(n);
     if(L0.boss){ const b=L0.boss; if(!ETYPES[b.kind]||!ETYPES[b.kind].boss) out.push('unknown boss "'+b.kind+'"'); if(!(b.x0<b.x&&b.x<b.x1)) out.push('boss starts outside its arena'); onFloor('boss',b.x,b.y); }
@@ -261,7 +261,7 @@ function harness(){
     for(const w of L0.warps) put_(w.x,w.y,w.enter?'v':'A');
     for(const s of L0.shards) put_(s.x,s.y,'D');
     if(L0.checkpoint) put_(L0.checkpoint.x,L0.checkpoint.y,'C');
-    if(L0.goal) put_(L0.goal.x,3,'F');
+    if(L0.goal) put_(L0.goal.x,L0.goal.y+1,'F');
     if(L0.boss) put_(L0.boss.x,L0.boss.y,'W');
     put_(L0.start.x,L0.start.y,'@');
     let ruler=''; for(let x=0;x<W0;x+=10) ruler+=String(x).padEnd(10);

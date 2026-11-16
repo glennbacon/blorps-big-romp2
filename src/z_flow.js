@@ -128,7 +128,7 @@ function animate(dt,time){
   const bl=(time%3.6)>3.45; if(bl!==blinkOn){ blinkOn=bl; eyeMat.map=bl?texEyeShut:texEyeOpen; }
   if(flagMesh) flagMesh.rotation.y=Math.sin(time*3)*0.18;
   if(cpFlag) cpFlag.rotation.y=Math.sin(time*2.6)*0.22;
-  if(motes){ const f=motes.userData.fall; motes.position.y=f?-((time*f)%8.5):Math.sin(time*0.7)*0.35; motes.position.x=Math.sin(time*0.23)*0.8; }
+  if(motes){ const f=motes.userData.fall; motes.position.y=f?-((time*f)%8.5):Math.sin(time*0.7)*0.35; /* a negative fall rises */ motes.position.x=Math.sin(time*0.23)*0.8; }
   if(sunMesh) sunMesh.rotation.z=Math.sin(time*0.5)*0.06;
   for(const c of clouds){ c.m.position.x+=c.v*dt; if(c.m.position.x>W+70) c.m.position.x=-70; }
   for(const c of critters) c.tick(dt,time);

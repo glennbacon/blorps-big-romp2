@@ -61,6 +61,7 @@ THEMES.shores={ music:'shores',
   /* on the sand: palms, parasols and cabins at the back, shells and starfish at the front */
   decor(S,D,R){
     const r=R(), y=D.ty*8;
+    if(D.wet){ if(r<0.3) put(S.near,dShell(pick(R,['#ffc2d6','#fff2c2','#c9b8ff'])),D.jx(),y,D.zb(1.2,5)); else if(r<0.5) put(S.near,dStarfish(pick(R,['#ff8fa8','#ffb347'])),D.jx(),y,D.zb(1.2,5)); return; }
     if(r<0.1&&D.free(6)&&D.open) put(S.flora,dPalm(R),D.jx(),y,D.zb(2.6,5),0.55);
     else if(r<0.14&&D.free(4)&&D.open) put(S.near,dParasol(pick(R,['#ff4f7b','#2fd6c3','#ffb347','#7b4fe0'])),D.jx(),y,D.zb(2.4,4.6));
     else if(r<0.165&&D.free(4)&&D.open) put(S.near,dCabin(pick(R,['#ff8fc7','#5fd0ff','#ffd23e','#7ee0a8'])),D.jx(),y,D.zb(4,5));
@@ -80,8 +81,7 @@ THEMES.shores={ music:'shores',
    and a pipe down to a hidden cove. */
 function w1l1(){
   const B=LevelBuilder(262,'shores');
-  B.room(0,227).room(232,261,0,15);
-  B.L.rooms[1].bonus=true;
+  B.room(0,227).room(232,261,0,15,true);
   B.ground(0,58).ground(62,128).ground(133,172).ground(176,231);
   B.sign(6,'Hold {run} to run. Hold {jump} longer to jump higher.');
   B.coins(10,3,3).row(15,5,'?').enemy('blob',20);

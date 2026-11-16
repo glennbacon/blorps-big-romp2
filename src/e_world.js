@@ -215,18 +215,18 @@ function laneDecor(S){
   for(let x=1;x<W-1;x++) for(let ty=1;ty<H-1;ty++){
     if(tiles[(ty-1)*W+x]!==GROUND||tiles[ty*W+x]===GROUND) continue;
     const free=h=>{ for(let k=0;k<h;k++){ const id=tileAt(x,ty+k); if(id!==AIR&&id!==COIN) return false; } return true; };
-    if(!free(1)||waterAt(x+0.5,ty+0.5)) continue;
+    if(!free(1)) continue;
     /* tall props keep clear of the checkpoint, whose flag stands further back than a canopy reaches, and of the hut
        after the flag, which they would poke out of */
-    const D={free,x,ty,back,open:Math.abs(x+0.5-cpX)>=4&&Math.abs(x+0.5-hutX)>=4.5&&!L.signs.some(s=>Math.abs(s.x-x-0.5)<1.5),
+    const D={free,x,ty,back,wet:!!waterAt(x+0.5,ty+0.5),open:Math.abs(x+0.5-cpX)>=4&&Math.abs(x+0.5-hutX)>=4.5&&!L.signs.some(s=>Math.abs(s.x-x-0.5)<1.5),
       /* a spot on the shelf behind the lane, between two depths given in tiles, and one on the lip in front of it */
       zb:(a,b)=>-(a+R()*(b-a))*8, zf:()=>(1.05+R()*0.35)*8, jx:()=>x*8+1+R()*6};
     if(TH.decor) TH.decor(S,D,R);
-    if(fringe&&R()<0.8){ const n=1+((R()*3)|0); for(let i=0;i<n;i++){ const fx_=x*8+R()*7, h=1+R()*1.6; S.flora.push([fx_,ty*8,11.2+R()*0.7,0.8,h,0.5,pick(R,fringe),ty*8,2.2]); } }
+    if(fringe&&!D.wet&&R()<0.8){ const n=1+((R()*3)|0); for(let i=0;i<n;i++){ const fx_=x*8+R()*7, h=1+R()*1.6; S.flora.push([fx_,ty*8,11.2+R()*0.7,0.8,h,0.5,pick(R,fringe),ty*8,2.2]); } }
   }
 }
 function addMotes(col,n,size,fall,glow){
-  const P=[], R=rng(77); for(let i=0;i<n;i++){ const x=R()*W, y=2.5+R()*(H-7.5), z=-4.2+R()*5.4; P.push(x,y,z); if(fall) P.push(x,y+8.5,z); }
+  const P=[], R=rng(77); for(let i=0;i<n;i++){ const x=R()*W, y=2.5+R()*(H-7.5), z=-4.2+R()*5.4; P.push(x,y,z); if(fall) P.push(x,y+(fall>0?8.5:-8.5),z); }
   const g=tmpGeo(new T.BufferGeometry()); g.setAttribute('position',new T.Float32BufferAttribute(P,3));
   const m=new T.PointsMaterial({color:col,size:size,sizeAttenuation:true,transparent:true,opacity:glow?0.95:0.85,depthWrite:false,blending:glow?T.AdditiveBlending:T.NormalBlending}); m.userData.tmp=true;
   motes=new T.Points(g,m); motes.userData.fall=fall||0; motes.frustumCulled=false; world.add(motes);
@@ -251,13 +251,13 @@ function buildScenery(){
 const HUT_DX=5, HUT_Z=-12; /* the hut after the flag: how many tiles past the pole it starts, and its depth in 1/8 tiles */
 function buildGoal(){
   flagMesh=null; if(!L.goal) return;
-  const gx=L.goal.x, b=[];
-  for(let i=0;i<18;i++) b.push([gx*8+3.4,24+i*4,-0.6,1.2,4,1.2,i%2?WHITE:'#ff4f7b']);
-  put(b,mHut(),(gx+HUT_DX)*8,16,HUT_Z);
+  const gx=L.goal.x, gy=L.goal.y*8, b=[];
+  for(let i=0;i<18;i++) b.push([gx*8+3.4,gy+8+i*4,-0.6,1.2,4,1.2,i%2?WHITE:'#ff4f7b']);
+  put(b,mHut(),(gx+HUT_DX)*8,gy,HUT_Z);
   addVox(b,S8,MAT.vox,true);
-  addVox([[gx*8+2.4,96,-1.6,3.2,3.2,3.2,'#ffe14d'],[gx*8+3,99.2,-1,2,1,2,'#fff3a0']],S8,MAT.glow,false);
+  addVox([[gx*8+2.4,gy+80,-1.6,3.2,3.2,3.2,'#ffe14d'],[gx*8+3,gy+83.2,-1,2,1,2,'#fff3a0']],S8,MAT.glow,false);
   flagMesh=vmesh('flag',()=>[[-12,0,-0.3,12,8,0.6,'#2fd6c3'],[-8.6,2,0.3,5,4,0.2,WHITE],[-7,3,0.5,2,2,0.15,INK],[-8.6,2,-0.5,5,4,0.2,WHITE]]);
-  flagMesh.position.set(gx+0.43,10.8,0); world.add(flagMesh);
+  flagMesh.position.set(gx+0.43,L.goal.y+8.8,0); world.add(flagMesh);
 }
 const CP_Z=-1.4; /* how far behind the walkway the checkpoint flag stands */
 function buildCheckpoint(){
@@ -272,7 +272,7 @@ function buildFixtures(){
   for(const s of L.signs){ const m=vmesh('sign',mSign); m.position.set(s.x,s.y,-0.75); world.add(m); signs.push({x:s.x,y:s.y,text:s.text,mesh:m}); }
   for(const d of L.pods){ const m=vmesh('pod',mPod); m.position.set(d.x,d.y,0); m.rotation.z=-d.ang; world.add(m); pods.push({x:d.x,y:d.y,ang:d.ang,power:d.power,t:0,mesh:m}); }
   for(const d of L.jets){ const v=vmesh('vent',mVent); v.position.set(d.x,d.y,0); world.add(v);
-    const f=new T.Mesh(partGeo,fireMat); f.position.set(d.x,d.y,0); world.add(f); const f2=new T.Mesh(partGeo,emberMat[1]); world.add(f2);
+    const f=new T.Mesh(partGeo,emberMat[0]); f.position.set(d.x,d.y,0); world.add(f); const f2=new T.Mesh(partGeo,emberMat[1]); world.add(f2);
     jets.push({x:d.x,y:d.y,len:d.len,period:d.period,t:d.phase,on:0,mesh:f,core:f2}); }
   for(const d of L.winds){ winds.push(Object.assign({t:0},d)); if(d.ay>0&&solidAt(Math.floor((d.x0+d.x1)/2),Math.floor(d.y0)-1)){ const m=vmesh('fan',mFan); m.position.set((d.x0+d.x1)/2,d.y0,0); world.add(m); } }
   for(const d of L.cannons) cannons.push({x:d.x,y:d.y,period:d.period,t:d.phase});

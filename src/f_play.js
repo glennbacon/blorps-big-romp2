@@ -177,21 +177,21 @@ function collectItem(it){
   burst(it.x,it.y+0.4,'#fff3a0',8,4,0.12,0.5,true);
 }
 function startGoal(){
-  const p=player, gx=L.goal.x;
-  p.goal='slide'; p.vx=0; p.vy=0; p.x=gx+0.5-0.4; p.y=clamp(p.y,3,11.2); p.star=0; p.inv=0; p.face=1; p.riding=null; p.onGround=false; p.pound=0; p.wall=0; p.glide=false;
-  const hgt=p.y-3; addScore(hgt>=7?5000:hgt>=5?2000:hgt>=3?800:hgt>=1.5?400:100,p.x,p.y+p.h);
+  const p=player, gx=L.goal.x, gy=L.goal.y+1;
+  p.goal='slide'; p.vx=0; p.vy=0; p.x=gx+0.5-0.4; p.y=clamp(p.y,gy,gy+8.2); p.star=0; p.inv=0; p.face=1; p.riding=null; p.onGround=false; p.pound=0; p.wall=0; p.glide=false;
+  const hgt=p.y-gy; addScore(hgt>=7?5000:hgt>=5?2000:hgt>=3?800:hgt>=1.5?400:100,p.x,p.y+p.h);
   musicStop(); sfx.slide(); G.goalT=0;
 }
 function updateGoal(dt){
-  const p=player, gx=L.goal.x;
+  const p=player, gx=L.goal.x, gy=L.goal.y+1;
   if(p.goal==='slide'){
-    p.y=Math.max(3,p.y-7*dt); if(flagMesh) flagMesh.position.y=Math.max(3.3,flagMesh.position.y-7*dt);
-    if(p.y<=3&&(!flagMesh||flagMesh.position.y<=3.3)){ G.goalT+=dt; if(G.goalT>0.35){ p.goal='walk'; p.x=gx+1.2; sfx.clear(); G.fountain=0; } }
+    p.y=Math.max(gy,p.y-7*dt); if(flagMesh) flagMesh.position.y=Math.max(gy+0.3,flagMesh.position.y-7*dt);
+    if(p.y<=gy&&(!flagMesh||flagMesh.position.y<=gy+0.3)){ G.goalT+=dt; if(G.goalT>0.35){ p.goal='walk'; p.x=gx+1.2; sfx.clear(); G.fountain=0; } }
   } else if(p.goal==='walk'){
     p.vx=4; p.vy-=60*dt; if(p.vy<-MAX_FALL) p.vy=-MAX_FALL; moveX(p,p.vx*dt);
     if(moveY(p,p.vy*dt)===1){ p.vy=0; p.onGround=true; } else p.onGround=false;
     /* fireworks over the hut while he walks to it */
-    G.fountain-=dt; if(G.fountain<=0){ G.fountain=0.22; const fx_=gx+3+Math.random()*7, fy=8+Math.random()*4, c=pick(Math.random,['#ffe14d','#ff4f7b','#2fd6c3','#b58cff','#ffffff']);
+    G.fountain-=dt; if(G.fountain<=0){ G.fountain=0.22; const fx_=gx+3+Math.random()*7, fy=gy+5+Math.random()*4, c=pick(Math.random,['#ffe14d','#ff4f7b','#2fd6c3','#b58cff','#ffffff']);
       for(let i=0;i<14;i++){ const a=i/14*6.283, s=3+Math.random()*2; spawnPart(fx_,fy,-1.5,c,Math.cos(a)*s,Math.sin(a)*s,0,0.7+Math.random()*0.3,0.14,5,true); } }
     if(p.x>=gx+6.5){ p.goal='in'; p.vx=0; proot.visible=false; burst(p.x,p.y+0.6,'#ffe14d',14,5,0.14,0.7,true); G.goalT=0; }
   } else { G.goalT+=dt; if(G.goalT>1.5){ p.goal='done'; levelClear(); } }
@@ -342,7 +342,7 @@ function updatePlayer(dt){
   for(const s of shards){ if(s.got||Math.abs(p.x-s.x)>0.85||p.y>s.y+0.75||p.y+p.h<s.y-0.75) continue; collectShard(s); }
   const cp=L.checkpoint;
   if(cp&&!G.cp&&p.x>cp.x-0.2&&Math.abs(p.y-cp.y)<4&&room===L.rooms[0]){ G.cp=true; if(cpFlag) cpFlag.material.color.set(0x2fd6c3); sfx.check(); popup(cp.x,cp.y+2.6,'Checkpoint','#7dffe6'); burst(cp.x,cp.y+1.6,'#2fd6c3',10,4,0.12,0.6,true); }
-  if(L.goal&&p.x<L.goal.x+1&&(p.x+p.w/2>=L.goal.x+0.43||(p.y<3&&p.x+p.w/2>=L.goal.x-0.01))) startGoal(); /* walking into the pole's base counts too */
+  if(L.goal&&p.x<L.goal.x+1&&p.y>=L.goal.y-0.2&&p.y<L.goal.y+12&&(p.x+p.w/2>=L.goal.x+0.43||(p.y<L.goal.y+1&&p.x+p.w/2>=L.goal.x-0.01))) startGoal(); /* walking into the pole's base counts too */
   if(L.boss&&!G.bossSeen&&p.x>L.boss.x0-6){ G.bossSeen=true; bossAppears(); }
   if(setRoom()) roomChanged();
   /* the pits: water can be swum out of until Blorp sinks from view; anything else is the end at a touch */

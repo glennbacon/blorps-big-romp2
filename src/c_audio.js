@@ -2,7 +2,7 @@
 /* Signal path:  sfx -> sg ─────────────────────────────┐
                  music notes -> song bus -> mg -> mf (underwater low-pass) -> dk (duck) -> comp -> master -> out
                  song "wet" bus -> es -> dl (echo, fed back through ef and fb) -> eo -> mg */
-const AU={ac:null,muted:false,dead:false,vol:0.5,muf:false,open:18000,master:null,comp:null,sg:null,mg:null,mf:null,dk:null,es:null,dl:null,ef:null,fb:null,eo:null,noise:null};
+const AU={ac:null,muted:false,dead:false,vol:0.4,muf:false,open:18000,master:null,comp:null,sg:null,mg:null,mf:null,dk:null,es:null,dl:null,ef:null,fb:null,eo:null,noise:null};
 /* Some old browsers return nothing from resume(), so never chain on it blindly. */
 function auWake(ac){ try{ const p=ac.resume(); if(p&&p.catch) p.catch(()=>{}); }catch(e){} }
 function auInit(){
@@ -15,7 +15,7 @@ function auInit(){
     AU.open=Math.min(18000,ac.sampleRate*0.45);
     AU.master=gn(AU.muted?0:AU.vol); AU.master.connect(ac.destination);
     /* a gentle compressor glues music and effects together and catches the odd pile-up of loud sounds */
-    const c=AU.comp=ac.createDynamicsCompressor(); c.threshold.value=-16; c.knee.value=12; c.ratio.value=3; c.attack.value=0.004; c.release.value=0.2; c.connect(AU.master);
+    const c=AU.comp=ac.createDynamicsCompressor(); c.threshold.value=-10; c.knee.value=10; c.ratio.value=3; c.attack.value=0.005; c.release.value=0.15; c.connect(AU.master);
     AU.sg=gn(1); AU.sg.connect(c);
     AU.dk=gn(1); AU.dk.connect(c);
     AU.mf=bq('lowpass',AU.muf?700:AU.open,0.5); AU.mf.connect(AU.dk);
@@ -129,11 +129,11 @@ const sfx={
   },
   /* --- jingles --- */
   die(){ jingle('square','B4 . F5 . F5 E5 D5 C5 . G4 . E4',0.085,0.11,0.14); jingle('triangle','G3 . D3 . D3 . G2 . . C3 . C2',0.085,0.26,0.16); },
-  clear(){ jingle('square','G4 C5 E5 G5 C6 E6 G6 . E6 . G6',0.1,0.1,0.2); jingle('square','E4 G4 C5 E5 G5 C6 E6 . C6 . E6',0.1,0.05,0.2); jingle('triangle','C3 . G3 . C4 . G3 . C4 . C3',0.1,0.28,0.2); },
+  clear(){ jingle('square','G4 C5 E5 G5 C6 E6 G6 . E6 . G6',0.1,0.1,0.2); jingle('square','E4 G4 C5 E5 G5 C6 E6 . C6 . E6',0.1,0.05,0.2); jingle('triangle','C3 . G3 . C4 . G3 . C4 . C3',0.1,0.24,0.2); },
   over(){ jingle('triangle','C5 . G4 . E4 . A4 B4 A4 Ab4 Bb4 Ab4 G4',0.13,0.28,0.22); jingle('sine','C3 . . . C3 . F3 . . Ab3 . . G3',0.13,0.26,0.4); },
   win(){
     jingle('square','C5 C5 C5 E5 G5 . E5 G5 C6 . C6 E6 G6 . . C7',0.11,0.1,0.24); jingle('square','E4 E4 E4 G4 C5 . C5 E5 G5 . G5 C6 E6 . . G6',0.11,0.05,0.24);
-    jingle('triangle','C3 . . C3 G3 . . G3 C4 . . E4 G4 . . C4',0.11,0.28,0.24); hiss(0.3,0.06,1.65,6000);
+    jingle('triangle','C3 . . C3 G3 . . G3 C4 . . E4 G4 . . C4',0.11,0.24,0.24); hiss(0.3,0.06,1.65,6000);
   },
   /* --- menus and messages --- */
   pause(){ tone('square',660,0,0.07,0.1); tone('square',440,0,0.1,0.1,0.08); },
@@ -148,7 +148,7 @@ const sfx={
   mapTile(k=0){ tone('square',392*Math.pow(2,((((k|0)%12)+12)%12)/6),0,0.07,0.07); },
   mapOpen(){ jingle('square','C5 E5 G5 C6',0.065,0.1,0.14); },
   mapPlay(){ jingle('square','G4 C5 E5 G5 C6',0.045,0.1,0.09); jingle('triangle','C4 . G4 . C5',0.045,0.2,0.12); },
-  gate(){ auWhoosh('lowpass',260,900,1,0.36,0,0.5); jingle('triangle','C3 G3 C4 E4 G4 C5',0.11,0.26,0.5); jingle('square','. . . C5 E5 G5 C6',0.11,0.08,0.45); }
+  gate(){ auWhoosh('lowpass',260,900,1,0.3,0,0.5); jingle('triangle','C3 G3 C4 E4 G4 C5',0.11,0.2,0.4); jingle('square','. . . C5 E5 G5 C6',0.11,0.07,0.4); }
 };
 
 /* ================= music: a step sequencer with any number of tracks ================= */
@@ -187,7 +187,7 @@ function musArp(chords,per,pat,lo){
    det: cents for a second, detuned oscillator (the fat pulse feel), h: pitch ratio of an added sine partial, vib: vibrato depth in cents on long notes, e: 1 sends it to the echo, dr: 1 marks a drum track}. */
 function song(o,...tracks){
   const tr=tracks.map(([ins,s])=>({ins,seq:parseTrack(s,ins.dr)})), spb=o.spb||2;
-  return {bpm:o.bpm,spb,bar:spb*(o.bpb||4),sw:o.sw||0,ec:o.ec||0.75,fb:o.fb||0.33,tr,len:Math.max(...tr.map(t=>t.seq.length))};
+  return {key:o.key||'',bpm:o.bpm,spb,bar:spb*(o.bpb||4),sw:o.sw||0,ec:o.ec||0.75,fb:o.fb||0.33,tr,len:Math.max(...tr.map(t=>t.seq.length))};
 }
 const mus={song:null,step:0,next:0,timer:0,rate:1,paused:false,fresh:false,dry:null,wet:null,hh:null,sn:null};
 /* one note of a pitched instrument: up to three oscillators through one envelope */
@@ -275,4 +275,170 @@ function musicDuck(sec=1){
 /* ================= the songs ================= */
 /* Each is built inside its own little function so the phrase names stay private. Leads are written out note by note; bass and arpeggios come from the chord line. */
 const SONGS={};
-/*SONGS*/
+/* title screen: the main theme. Bright C major, a leaping tune over a busy arpeggio; the middle eight lifts to F and climbs home through D7 and G7. */
+SONGS.title=(()=>{
+  const h='G5 . E5 G5 C6 - G5 .  B5 - A5 G5 D5 - . .  A5 . E5 A5 C6 - B5 A5  G5 - E5 . B4 - . .  A5 . F5 A5 C6 - A5 . ';
+  const a=h+'G5 - E5 C5 E5 - G5 .  F5 . D5 F5 A5 - G5 F5  G5 - - . D5 G5 B5 D6 ';
+  const a2=h+'B5 - G5 B5 D6 - B5 .  C6 - - . G5 . E5 .  C5 - . . C5 E5 G5 C6 ';
+  const b='A5 - - F5 A5 - C6 -  D6 - C6 A5 F5 - . .  G5 - - E5 G5 - C6 -  E6 - D6 C6 G5 - . .  F#5 - - D5 F#5 - A5 -  C6 - B5 A5 F#5 - A5 .  B5 - - . D6 - - .  D5 G5 B5 D6 F6 - D6 B5 ';
+  const a3=h+'B5 - G5 B5 D6 - B5 .  C6 - - . E6 - C6 .  D6 - B5 G5 D5 G5 B5 D6 ';
+  const ch='C G Am Em F C Dm G  C G Am Em F G C C  F F C C D7 D7 G G7  C G Am Em F G C G';
+  const d='k . h . s . h h ', d2='k h h k s h k h ';
+  return song({key:'C major',bpm:132},
+    [{w:'square',v:0.045,det:9,vib:9,s:0.5,e:1},a+a2+b+a3],
+    [{w:'square',v:0.02,g:0.5},musArp(ch,8,'1 5 8 5 3 5 8 5','G3')],
+    [{w:'triangle',v:0.24,g:0.8},musArp(ch,8,'1 . . 1 5 . 1 3','E2')],
+    [{dr:1,v:1},(d.repeat(7)+'k . h . s s s s ').repeat(2)+d2.repeat(7)+'k . s . s s s s '+d.repeat(7)+'k . h o s . s s ']);
+})();
+/* the world map: an easy stroll in F major with a lazy swing, slower than any level */
+SONGS.map=(()=>{
+  const h='C5 . F5 . A5 - G5 F5  A5 - F5 . D5 - . .  D5 . F5 . Bb5 - A5 G5  G5 - E5 . C5 - . . ';
+  const a=h+'C5 . F5 . A5 - C6 A5  D6 - A5 . F5 - . A5  Bb5 . A5 . G5 . D5 .  E5 - G5 - C5 - . . ';
+  const b='D5 - F5 - Bb5 - - .  A5 . Bb5 . D6 - Bb5 .  C6 - A5 - F5 - - .  E5 . F5 . A5 - F5 .  G5 - Bb5 - D6 - - .  C6 . Bb5 . G5 - Bb5 .  G5 - E5 - C5 - E5 G5  Bb5 - G5 - E5 - C5 . ';
+  const a3=h+'C5 . F5 . A5 - C6 A5  D6 - A5 . F5 - D5 .  F5 . D5 . Bb4 - D5 F5  E5 - - . G5 - - . ';
+  const ch='F Dm Bb C F Dm Gm C  Bb Bb F F Gm Gm C C7  F Dm Bb C F Dm Bb C';
+  return song({key:'F major',bpm:96,sw:0.16},
+    [{w:'triangle',v:0.2,vib:8,s:0.6,e:1},a+b+a3],
+    [{w:'sine',v:0.08,g:0.6},musArp(ch,8,'. 5 8 5 . 5 3^ 5','F3')],
+    [{w:'triangle',v:0.24,g:0.8},musArp(ch,8,'1 . . 5 1 . 5 .','F2')],
+    [{dr:1,v:0.6},'k . r . p . r r']);
+})();
+/* world 1, Sprinkle Shores: a calypso in G major. The lead is a steel pan (a triangle with a sine an octave up), the bass and kick lean on the 3-3-2 beat. */
+SONGS.shores=(()=>{
+  const h='D6 . B5 D6 . B5 G5 .  B5 - . G5 - . D5 .  E6 . C6 E6 . C6 G5 .  C6 - . G5 - . E5 .  F#5 . A5 D6 . A5 F#5 .  A5 - . C6 - . A5 F#5 ';
+  const a=h+'G5 . B5 D6 . G6 D6 .  B5 - - . D5 G5 B5 . ';
+  const a2=h+'G5 B5 D6 G6 . D6 B5 .  G5 - - . F5 G5 B5 D6 ';
+  const b='E6 - - C6 E6 - G6 .  E6 . C6 . G5 - . .  D6 - - B5 D6 - G6 .  D6 . B5 . G5 - . .  C#6 - - A5 C#6 - E6 .  G6 . E6 . C#6 - A5 .  D6 . F#6 . A6 - F#6 .  D6 - C6 - A5 F#5 A5 C6 ';
+  const a3=h+'G5 B5 D6 G6 . D6 B5 .  G5 - - . . D5 G5 B5 ';
+  const ch='G G C C D D7 G G  G G C C D D7 G G7  C C G G A7 A7 D D7  G G C C D D7 G G';
+  return song({key:'G major',bpm:126},
+    [{w:'triangle',v:0.12,h:2,g:0.95,e:1},a+a2+b+a3],
+    [{w:'triangle',v:0.07,h:2,g:0.5},musArp(ch,8,'. 3 5 . 3 5 . 3','G3')],
+    [{w:'triangle',v:0.25,g:0.85},musArp(ch,8,'1 - . 5 - . 1 .','E2')],
+    [{dr:1,v:0.9},'kr r c kr . c b r '.repeat(7)+'kr r c kr c c b b']);
+})();
+/* world 2, Jellybean Jungle: D major, all bounce. A xylophone lead (a triangle with a sine two octaves up), off-beat stabs, an octave-hopping bass and congas. */
+SONGS.jungle=(()=>{
+  const h='D5 . F#5 . A5 . F#5 A5  D6 . A5 . F#5 - . .  G5 . B5 . D6 . B5 D6  E6 . D6 . B5 - . . ';
+  const a=h+'A5 A5 . F#5 . D5 F#5 A5  D6 - . A5 - . F#5 .  E5 . A5 . C#6 . A5 C#6  E6 . C#6 A5 E5 - . . ';
+  const a2=h+'A5 A5 . F#5 . D5 F#5 A5  G5 . E5 . C#5 . E5 G5  F#5 . A5 . D6 - . .  D6 D6 . A5 . F#5 D5 . ';
+  const b='B5 - . F#5 B5 - D6 .  C#6 . B5 . F#5 - . .  B5 - . G5 B5 - D6 .  E6 . D6 . B5 - . .  G5 - . E5 G5 - B5 .  A5 . G5 . E5 - G5 .  A5 . C#6 . E6 . C#6 .  G6 . E6 . C#6 A5 G5 E5 ';
+  const ch='D D G G D D A A  D D G G D A D D  Bm Bm G G Em Em A A7  D D G G D A D D';
+  return song({key:'D major',bpm:144},
+    [{w:'triangle',v:0.12,h:4,g:0.6,e:1},a+a2+b+a2],
+    [{w:'square',v:0.022,g:0.35},musArp(ch,8,'. 5 . 3^ . 5 . 3^','G3')],
+    [{w:'triangle',v:0.25,g:0.6},musArp(ch,8,'1 . 8 1 . 8 5 .','E2')],
+    [{dr:1,v:0.9},'kr . c cr s . b r '.repeat(7)+'kr . c c s b b b']);
+})();
+/* world 3, Fizzy Deep: a slow waltz in E flat major. Long sung notes with vibrato float over seventh-chord arpeggios, and everything swims in echo. */
+SONGS.deep=(()=>{
+  const a='G5 - - - Bb5 -  Eb6 - - - - .  D6 - - - C6 -  G5 - - - - .  Ab5 - - - C6 -  Eb6 - - - C6 -  D6 - - - Bb5 -  F5 - - - - .  '+
+    'G5 - - - Bb5 -  Eb6 - - - G6 -  F6 - - - D6 -  Bb5 - - - - .  C6 - Bb5 - Ab5 -  Bb5 - Ab5 - F5 -  Eb5 - - - - -  - - . . Bb5 - ';
+  const b='C6 - - Bb5 Ab5 -  C6 - - - Eb6 -  Bb5 - - Ab5 G5 -  Bb5 - - - Eb6 -  Ab5 - - G5 F5 -  Ab5 - - - C6 -  Bb5 - - - D6 -  F6 - - - - .  '+
+    'Eb6 - - D6 C6 -  G5 - - - C6 -  C6 - - Bb5 Ab5 -  Eb5 - - - Ab5 -  F5 - G5 - Ab5 -  C6 - Bb5 - Ab5 -  Bb5 - - - - -  Ab5 - F5 - D5 - ';
+  const ch='EbM7 EbM7 Cm7 Cm7 AbM7 AbM7 Bb Bb  EbM7 EbM7 Gm7 Gm7 Ab Bb Eb Eb  AbM7 AbM7 EbM7 EbM7 Fm7 Fm7 Bb Bb  Cm7 Cm7 AbM7 AbM7 Fm7 Fm7 Bb Bb7';
+  return song({key:'Eb major',bpm:108,bpb:3,ec:1,fb:0.4},
+    [{w:'sine',v:0.2,vib:10,s:0.7,a:0.03,e:1},a+b],
+    [{w:'triangle',v:0.09,g:0.8,e:1},musArp(ch,6,'1 5 7 3^ 7 5','Ab3')],
+    [{w:'sine',v:0.05,s:0.9,a:0.15,g:1},musArp(ch,6,'5 - - - - -','Ab3')],
+    [{w:'triangle',v:0.24,s:0.5,g:0.95},musArp(ch,6,'1 - - - 5 -','Ab2')],
+    [{dr:1,v:0.5},'k . r . r .  k . r . r c']);
+})();
+/* world 4, Spooky Hollow: D minor on tiptoe, with a swing. Short plucked notes that creep past their neighbours, a ghost whistling far above, and a major-key middle so it stays friendly. */
+SONGS.hollow=(()=>{
+  const h='D5 . F5 . A5 . G#5 A5  D6 . . A5 . F5 . .  G5 . Bb5 . D6 . C#6 D6  G6 . . D6 . Bb5 . . ';
+  const a=h+'A5 . A5 G#5 A5 . F5 .  D5 . F5 . A5 - . .  C#5 . E5 . G5 . Bb5 .  A5 - - . E5 . C#5 . ';
+  const a2=h+'F6 . D6 . Bb5 . D6 .  E6 . C#6 . A5 . G5 E5  D5 . F5 A5 D6 - . .  . . A4 . D5 . . . ';
+  const b='C6 - A5 . F5 . A5 .  C6 . C6 D6 C6 - A5 .  Bb5 - G5 . E5 . G5 .  Bb5 . Bb5 C6 Bb5 - G5 .  A5 - G5 . D5 . G5 .  Bb5 . A5 . G5 - D5 .  E5 . G5 . Bb5 . A5 G5  A5 - - . C#6 - - . ';
+  const ch='Dm Dm Gm Gm Dm Dm A7 A7  Dm Dm Gm Gm Bb A7 Dm Dm  F F C7 C7 Gm Gm A7 A7  Dm Dm Gm Gm Bb A7 Dm Dm';
+  return song({key:'D minor',bpm:116,sw:0.18},
+    [{w:'square',v:0.05,g:0.5,e:1},a+a2+b+a2],
+    [{w:'triangle',v:0.11,g:0.35},musArp(ch,8,'. 3 . 5 . 3 . 5','G3')],
+    [{w:'sine',v:0.04,vib:18,s:0.9,a:0.12,g:1},musArp(ch,8,'5 - - - - - - -','A4')],
+    [{w:'triangle',v:0.25,g:0.5},musArp(ch,8,'1 . 5 . 8 . 5 .','F2')],
+    [{dr:1,v:0.7},'k . h h p . h h '.repeat(7)+'k . h h p p h p']);
+})();
+/* stretch a line written in eighths onto a sixteenth grid: every note, hold and rest lasts two steps */
+function musX2(s){ return s.trim().split(/\s+/).map(k=>k==='.'?'. .':k+' -').join(' ')+' '; }
+/* world 5, Tick-Tock Works: B minor on a sixteenth grid. Tick and tock mark every eighth, the arpeggio chugs like a piston, and the tune is stiff and wound-up until the middle section sings over the machinery. */
+SONGS.works=(()=>{
+  const h='B4 . B4 D5 F#5 . F#5 .  B5 . A5 F#5 D5 . F#5 .  G4 . G4 B4 D5 . D5 .  G5 . F#5 D5 B4 . D5 . ';
+  const a=h+'E5 . E5 G5 B5 . B5 .  E6 . D6 B5 G5 . B5 .  F#5 . A#5 . C#6 . A#5 .  F#5 F#5 . F#5 A#5 C#6 F#6 . ';
+  const a2=h+'E5 . E5 G5 B5 . E6 .  C#6 . A#5 . F#5 . A#5 C#6  B5 - . F#5 D5 . F#5 .  B4 . B4 . B5 . . . ';
+  const b='F#5 - - A5 D6 - - .  C#6 - D6 - A5 - - .  E5 - - A5 C#6 - - .  B5 - C#6 - A5 - - .  G5 - - B5 E6 - - .  D6 - E6 - B5 - G5 .  A#5 - - C#6 F#6 - - .  E6 - C#6 - A#5 - F#5 . ';
+  const ch='Bm Bm G G Em Em F# F#  Bm Bm G G Em F# Bm Bm  D D A A Em Em F# F#7  Bm Bm G G Em F# Bm Bm';
+  return song({key:'B minor',bpm:138,spb:4},
+    [{w:'square',v:0.04,det:7,g:0.8,e:1},musX2(a+a2+b+a2)],
+    [{w:'square',v:0.018,g:0.45},musArp(ch,16,'1 5 8 5 3 5 8 5','D3')],
+    [{w:'triangle',v:0.26,g:0.6},musArp(ch,16,'1 . 1 . 8 . 1 . 1 . 1 . 8 . 5 .','E2')],
+    [{dr:1,v:0.9},'kt . h . sT . h . kt . h k sT . h h '.repeat(7)+'kt . h . sT . h . kt . s . s s s s']);
+})();
+/* world 6, Cloud Nine: A major, wide open. A soaring pulse lead with slow vibrato holds its notes over rising arpeggios and a soft pad. */
+SONGS.clouds=(()=>{
+  const h='E5 - A5 - C#6 - - B5  B5 - - G#5 E5 - - .  F#5 - A5 - C#6 - - D6  D6 - - A5 F#5 - - . ';
+  const k='D6 - - B5 F#5 - B5 -  E6 - - D6 B5 - G#5 -  ';
+  const a=h+'E5 - A5 - C#6 - E6 -  E6 - - D6 B5 - G#5 -  A5 - - F#5 D6 - - C#6  B5 - - - . E5 G#5 B5 ';
+  const a2=h+k+'A5 - - - - - E5 A5  C#6 - - - A5 - E6 - ';
+  const b='F#6 - - - D6 - A5 -  F#6 - E6 - D6 - - .  E6 - - - C#6 - A5 -  E6 - D6 - C#6 - - .  D6 - - - B5 - F#5 -  D6 - C#6 - B5 - - .  B5 - - G#5 B5 - E6 -  D6 - - B5 G#5 - E5 - ';
+  const a3=h+k+'A5 - - - - - . .  B5 - G#5 - E5 - . . ';
+  const ch='A E F#m D A E D E  A E F#m D Bm E A A  D D A A Bm Bm E E7  A E F#m D Bm E A E';
+  return song({key:'A major',bpm:140},
+    [{w:'square',v:0.042,det:8,vib:12,s:0.6,a:0.015,e:1},a+a2+b+a3],
+    [{w:'triangle',v:0.085,g:0.6,e:1},musArp(ch,8,'1 3 5 8 3^ 8 5 3','A3')],
+    [{w:'sine',v:0.05,s:0.9,a:0.12,g:1},musArp(ch,8,'5 - - - - - - -','A3')],
+    [{w:'triangle',v:0.24,g:0.85},musArp(ch,8,'1 - . 1 5 - 8 .','E2')],
+    [{dr:1,v:0.8},'k . h h s . h o '.repeat(7)+'k . h h s . s s']);
+})();
+/* world 7, Magma Mountain: C minor and in a hurry. A buzzing saw lead hammers repeated notes, a saw bass pounds in octaves with a triangle underneath for weight. */
+SONGS.magma=(()=>{
+  const h='C5 C5 . Eb5 . G5 . Eb5  C6 - Bb5 G5 Eb5 - . .  Ab4 Ab4 . C5 . Eb5 . C5  Ab5 - G5 Eb5 C5 - . . ';
+  const a=h+'F5 F5 . Ab5 . C6 . Ab5  F6 - Eb6 C6 Ab5 - . .  G5 . B5 . D6 . F6 .  Eb6 D6 B5 G5 D5 G5 B5 D6 ';
+  const a2=h+'F5 F5 . Ab5 . C6 . F6  D6 . B5 . G5 . B5 D6  C6 - - G5 Eb5 - G5 .  C5 C5 . C5 . G4 C5 . ';
+  const b='G5 - - Bb5 Eb6 - - .  D6 - Eb6 - Bb5 - G5 .  F5 - - Bb5 D6 - - .  C6 - D6 - Bb5 - F5 .  Eb5 - - Ab5 C6 - - .  Bb5 - C6 - Ab5 - Eb5 .  D5 . G5 . B5 . D6 .  F6 - D6 - B5 G5 F5 D5 ';
+  const ch='Cm Cm Ab Ab Fm Fm G G  Cm Cm Ab Ab Fm G Cm Cm  Eb Eb Bb Bb Ab Ab G G7  Cm Cm Ab Ab Fm G Cm Cm';
+  return song({key:'C minor',bpm:168},
+    [{w:'sawtooth',v:0.045,det:10,g:0.8,e:1},a+a2+b+a2],
+    [{w:'square',v:0.02,g:0.4},musArp(ch,8,'8 5 3 5 8 5 3 5','G3')],
+    [{w:'sawtooth',v:0.07,g:0.6},musArp(ch,8,'1 1 8 1 1 1 8 1','C2')],
+    [{w:'triangle',v:0.2,g:0.9},musArp(ch,8,'1 - - . 1 - . .','G2')],
+    [{dr:1,v:1},'k h s h k k s h '.repeat(7)+'k k s s k s s s']);
+})();
+/* world 8, Lunar Palace: E minor, slow and huge. The lead leaps fifths and octaves and hangs there; twinkling ninths, a long echo and a sparse beat leave room for the low gravity. The middle rises to G and D before falling back through B7. */
+SONGS.moon=(()=>{
+  const h='E5 - - - B5 - - -  G5 - - F#5 E5 - - .  E5 - - - C6 - - -  B5 - - G5 E5 - - . ';
+  const a=h+'A5 - - - E6 - - -  C6 - - B5 A5 - - .  B5 - - - F#6 - - -  D#6 - - B5 A5 - F#5 - ';
+  const a2=h+'A5 - - - E6 - C6 -  B5 - A5 - F#5 - D#5 -  E5 - - - - - G5 B5  E6 - - - - - . . ';
+  const b='D6 - - - B5 - G5 -  D6 - - - - - B5 D6  F#6 - - - D6 - A5 -  F#6 - - - - - E6 D6  E6 - - - B5 - G5 -  E6 - - D6 C6 - B5 -  B5 - - - D#6 - - -  F#6 - - - - - B5 - ';
+  const ch='Em Em CM7 CM7 Am Am B7 B7  Em Em CM7 CM7 Am B7 Em Em  G G D D CM7 CM7 B7 B7  Em Em CM7 CM7 Am B7 Em Em';
+  return song({key:'E minor',bpm:104,ec:1.5,fb:0.45},
+    [{w:'square',v:0.04,det:6,vib:12,s:0.7,a:0.03,e:1},a+a2+b+a2],
+    [{w:'sine',v:0.07,g:0.5,e:1},musArp(ch,8,'1 5 8 9 3^ 9 8 5','G3')],
+    [{w:'sine',v:0.05,s:0.9,a:0.2,g:1},musArp(ch,8,'5 - - - - - - -','E3')],
+    [{w:'triangle',v:0.26,s:0.6,g:0.95},musArp(ch,8,'1 - - - - - 5 -','E2')],
+    [{dr:1,v:0.7},'k . h . . . h .  k . h . s . h h']);
+})();
+/* boss fights: G minor at a gallop. The harmony steps down G minor, F, E flat, D like a closing trap; the middle section swerves to A flat for drama. */
+SONGS.boss=(()=>{
+  const h='G5 . Bb5 D6 . Bb5 G5 .  D6 - - Bb5 G5 - D5 .  F5 . A5 C6 . A5 F5 .  C6 - - A5 F5 - C5 . ';
+  const a=h+'Eb5 . G5 Bb5 . G5 Eb5 .  Bb5 - - G5 Eb5 - G5 Bb5  A5 . F#5 A5 . D6 A5 .  F#5 A5 D6 F#6 . D6 C6 A5 ';
+  const a2=h+'Eb5 . G5 Bb5 . Eb6 Bb5 .  D6 . C6 A5 . F#5 A5 C6  Bb5 - - G5 D5 - G5 .  G5 G5 . G5 . D5 G5 . ';
+  const b='C6 - - Eb6 G6 - - .  F6 - Eb6 - C6 - G5 .  Bb5 - - D6 G6 - - .  F6 - D6 - Bb5 - G5 .  Ab5 - - C6 Eb6 - - .  D6 - C6 - Ab5 - Eb5 .  D5 F#5 A5 D6 . A5 F#5 .  C6 . A5 . F#5 . D5 . ';
+  const ch='Gm Gm F F Eb Eb D D  Gm Gm F F Eb D Gm Gm  Cm Cm Gm Gm Ab Ab D D7  Gm Gm F F Eb D Gm Gm';
+  return song({key:'G minor',bpm:164},
+    [{w:'square',v:0.045,det:12,vib:8,g:0.85,e:1},a+a2+b+a2],
+    [{w:'sawtooth',v:0.022,g:0.4},musArp(ch,8,'1 . 3 1 . 3 5 .','C4')],
+    [{w:'sawtooth',v:0.07,g:0.6},musArp(ch,8,'1 . 1 1 1 . 1 1','C2')],
+    [{w:'triangle',v:0.22,g:0.7},musArp(ch,8,'1 . . 1 . . 5 .','G2')],
+    [{dr:1,v:1},'kh h sh kh h kh sh h '.repeat(7)+'kh kh sh sh kb kb s s']);
+})();
+/* secret coin rooms: sixteen giddy bars of E major, all running eighths and hand claps, over before you know it and round again */
+SONGS.bonus=(()=>{
+  const a='E5 G#5 B5 E6 B5 G#5 B5 .  E6 . E6 . D#6 B5 G#5 .  A5 C#6 E6 A6 E6 C#6 E6 .  A6 . A6 . G#6 E6 C#6 .  B5 G#5 E5 G#5 B5 E6 G#6 .  B5 . G#5 . E5 - . .  F#5 B5 D#6 F#6 D#6 B5 D#6 .  F#6 . D#6 . B5 A5 F#5 D#5 ';
+  const a2='C#6 . E6 . A5 . C#6 E6  A6 - E6 . C#6 - . .  B5 . E6 . G#5 . B5 E6  G#6 - E6 . B5 - . .  A#5 . C#6 . E6 . C#6 A#5  B5 D#6 F#6 B6 . F#6 D#6 .  E6 . B5 G#5 E5 . G#5 B5  D#6 . B5 . F#5 A5 B5 D#6 ';
+  const ch='E E A A E E B B7  A A E E F#7 B E B7';
+  return song({key:'E major',bpm:184},
+    [{w:'square',v:0.05,g:0.7,e:1},a+a2],
+    [{w:'triangle',v:0.1,g:0.4},musArp(ch,8,'. 5 . 8 . 5 . 8','A3')],
+    [{w:'triangle',v:0.25,g:0.6},musArp(ch,8,'1 . 8 . 1 . 8 5','E2')],
+    [{dr:1,v:0.9},'k h sp h k k sp h '.repeat(7)+'k h sp h sp sp sp sp']);
+})();
