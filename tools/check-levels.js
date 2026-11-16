@@ -98,7 +98,7 @@ function harness(){
           if(done()) return 'win';
         }
       } else {
-        const jump=rnd()<0.6, hold=0.04+rnd()*0.58;
+        const jump=rnd()<0.6, hold=form===3&&rnd()<0.3?0.5+rnd()*3:0.04+rnd()*0.58; /* a long hold is a glide */
         const dur=jump?3.2:0.1+rnd()*0.6;
         let sw=rnd()<0.3?rnd()*0.9:-1; const swDir=((rnd()*3)|0)-1;
         let dn=rnd()<0.16?rnd()*0.8:-1;

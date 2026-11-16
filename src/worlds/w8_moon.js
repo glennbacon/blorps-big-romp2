@@ -258,5 +258,97 @@ function w8l1(){
   B.goal(207);
   return B.L;
 }
+/* 8-2: the crystal caves. Bridges of crystal that crumble over nothing at all, ghosts that follow across them, and a
+   switch that opens a wall and builds a bridge to a shard. */
+function w8l2(){
+  const B=LevelBuilder(262,'moon',20);
+  B.room(0,231).room(236,261,0,19,true);
+  B.ground(0,40).ground(60,96).ground(112,150).ground(166,235).fill(0,15,235,19,GROUND);
+  B.coins(6,3,3).row(10,6,'?M?').enemy('ghost',19,7).enemy('clonk',27,9).enemy('spikit',34);
+  B.row(41,1,'KKKKKKKKKKKKKKKKKKK').coins(43,3,15).shard(50,7).enemy('ghost',47,9);
+  B.row(64,6,'B?X').sign(62,'Hit the switch: the red wall opens.').enemy('w8boing',70);
+  B.fill(76,2,77,14,RED).row(81,8,'UUU').shard(82,12).enemy('clonk',87,9).enemy('spikit',92);
+  B.row(97,1,'KKKKK').row(105,1,'KKKKKKK').coins(98,3,3).coins(106,3,5).enemy('batty',103,7,{rx:3});
+  B.checkpoint(116);
+  B.row(120,6,'?F?').enemy('ghost',126,5).warp(131,2,'in').enemy('clonk',137,9).enemy('ghost',141,8).warp(145,3,'out',true);
+  B.row(151,1,'KKKK').plat(156,2,3,'x',4,1.1).row(163,1,'KKK').coins(157,4,5);
+  B.enemy('fizzle',172).row(176,6,'B?B').enemy('clonk',183,9).enemy('w8boing',190).enemy('spikit',196);
+  B.stairs(204,6).fill(210,2,210,7,HARD).clear(200,15,231,19);
+  B.goal(216);
+  /* a crystal vault: one great spring, and a shard far above it */
+  B.fill(232,2,235,14,GROUND).ground(236,261).fill(236,2,236,19,HARD).fill(261,2,261,19,HARD).fill(236,16,261,19,GROUND);
+  B.warp(238,2,'in',true).warp(257,2,'out').spring(247).row(250,11,'===').shard(251,13).coinCol(247,5,7).coinBox(252,3,254,4);
+  return B.L;
+}
+
+/* 8-3: the floating stair. Up to the palace gate, chunk by drifting chunk: a lift, a pod, a rising wind, ledges that
+   fall, a cleft to kick up, and a wheel of stone to ride. */
+function w8l3(){
+  const B=LevelBuilder(84,'moon',60);
+  B.look(2).ground(0,20).start(4);
+  B.coins(7,3,3).row(10,6,'?M?').enemy('spikit',15).plat(21,2,3,'y',5,1).coinCol(22,4,4);
+  /* first chunk, and a pod to the second */
+  B.fill(26,6,40,7,GROUND).enemy('w8boing',32,8).shard(33,13).pod(42,9,18,19).sign(37,'Hop in the pod.',8);
+  B.fill(46,13,60,14,GROUND).enemy('blob',50,15).row(51,19,'?F?').enemy('batty',54,18,{rx:3});
+  /* a rising wind off the end of it */
+  B.wind(57,15,60,25,0,95).coinCol(58,17,6);
+  B.fill(62,21,76,22,GROUND).enemy('spikit',70,23).row(79,24,'H').shard(79,27).coins(66,24,4);
+  /* ledges that fall */
+  B.fall(57,25,3).fall(52,27,3).coins(58,27,1).coins(53,29,1);
+  B.fill(34,29,48,30,GROUND).checkpoint(44,31).row(40,35,'?M?').enemy('zappy',41,38,{rx:5});
+  /* the cleft: under the right wall, up between the two, and off over the left one */
+  B.fill(37,33,37,45,HARD).fill(33,31,33,38,HARD).coinCol(35,32,7);
+  B.fill(14,37,30,38,GROUND).enemy('w8boing',22,39).enemy('spikit',17,39).shard(16,44);
+  /* the wheel, and the gate */
+  B.plat(31,42,3,'c',3,1).fill(40,45,83,46,GROUND).enemy('batty',46,52,{rx:3});
+  B.goal(52,47);
+  return B.L;
+}
+
+/* 8-4: the palace halls. The longest road in the game: belts, cannons, Clonks, flame and ghosts, a hall at a time, with
+   somewhere to catch a breath between them. */
+function w8l4(){
+  const B=LevelBuilder(318,'moon',20);
+  B.room(0,287).room(292,317,0,19,true);
+  B.ground(0,60).ground(68,120).ground(128,176).ground(184,291).fill(0,16,291,19,GROUND);
+  B.coins(6,3,3).row(10,6,'?M?').enemy('spikit',16);
+  /* the hall of belts */
+  B.conveyor(20,30,1,1).enemy('clonk',25,9).conveyor(34,44,1,-1).enemy('clonk',39,9).coins(21,3,9).enemy('ghost',48,8).row(52,6,'B?B');
+  B.plat(61,2,3,'x',3,1.2).coins(62,4,4);
+  /* the hall of cannons */
+  B.cannon(74,2,3).cannon(74,3,3,1.5).enemy('fizzle',80).cannon(88,2,2.8).fill(96,2,96,3,HARD).cannon(96,4,3).enemy('w8boing',102).row(106,6,'?F?').shard(107,11);
+  B.cannon(114,2,3.2).fall(121,2,3).fall(125,2,2);
+  B.checkpoint(132);
+  /* the hall of flame */
+  B.jet(138,2,4,2.6).jet(142,2,4,2.6,0.9).jet(146,2,4,2.6,1.8).firebar(154,7,6,1.5).enemy('spikit',160).firebar(166,7,6,-1.5).row(159,6,'?M?');
+  B.fill(170,4,170,13,HARD).fill(174,4,174,13,HARD).coinCol(172,4,7).shard(172,13);
+  B.plat(177,2,3,'x',3,1.1).coins(178,4,4);
+  /* the long gallery: ghosts, a switch, and the Queen's guard */
+  B.enemy('ghost',192,8).row(196,6,'X').fill(204,2,205,15,RED).enemy('clonk',212,9).enemy('ghost',218,5).warp(224,2,'in').enemy('rammy',232).enemy('clonk',240,9).warp(246,3,'out',true);
+  B.conveyor(250,258,1,-1).jet(261,2,4,2.4).enemy('fizzle',264);
+  B.stairs(266,6).fill(272,2,272,7,HARD).clear(262,16,287,19);
+  B.goal(278);
+  /* the treasury */
+  B.fill(288,2,291,15,GROUND).ground(292,317).fill(292,2,292,19,HARD).fill(317,2,317,19,HARD).fill(292,16,317,19,GROUND);
+  B.warp(294,2,'in',true).warp(313,2,'out').coinBox(299,3,310,5).row(302,9,'=====').shard(304,10).enemy('ghost',308,11).row(300,6,'?L?');
+  return B.L;
+}
+
+/* 8-5: the throne. Up the red carpet past the last of the guard, and then Queen Grizzle: she walks, hops and lobs bombs;
+   hurt, her landings send ripples along the floor; cornered, she charges too, and throws three bombs at a time. */
+function w8l5(){
+  const B=LevelBuilder(180,'moon',20);
+  B.ground(0,179).fill(0,16,179,19,GROUND);
+  B.coins(6,3,3).row(10,6,'?M?').enemy('spikit',17).enemy('clonk',24,9).cannon(32,2,3).cannon(32,3,3,1.5).enemy('ghost',40,8);
+  B.row(46,6,'===').row(50,9,'===').shard(51,13).coins(46,7,3);
+  B.jet(58,2,4,2.6).jet(62,2,4,2.6,1.3).enemy('fizzle',68).fill(74,4,74,13,HARD).fill(78,4,78,13,HARD).coinCol(76,4,7).shard(76,13);
+  B.enemy('clonk',86,9).enemy('rammy',92).row(96,2,'X').row(99,6,'U').row(102,9,'UU').shard(103,12);
+  B.checkpoint(108);
+  B.row(112,6,'?M?').row(116,6,'F').sign(119,'Queen Grizzle. Five stomps. Jump the ripples, mind the bombs, and get out of the way when she charges.');
+  B.row(128,6,'====').row(150,6,'====').fill(164,2,179,15,GROUND);
+  B.boss(150,124,160,15,'queen');
+  return B.L;
+}
+
 function w8stub(look){ return ()=>{ const B=LevelBuilder(120,'moon'); B.look(look); B.ground(0,119).shard(8,3).shard(10,3).shard(12,3).row(20,6,'?M?').spring(30).pod(40,3,0,24).fill(50,2,50,14,HARD).fill(54,2,54,14,HARD); if(look===4) B.fill(100,2,119,13,GROUND).boss(80,60,95,15,'queen'); else B.goal(100); return B.L; }; }
-defWorld({name:'Lunar Palace',theme:'moon',levels:[w8l1,w8stub(1),w8stub(2),w8stub(3),w8stub(4)]});
+defWorld({name:'Lunar Palace',theme:'moon',levels:[w8l1,w8l2,w8l3,w8l4,w8l5]});

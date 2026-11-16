@@ -336,7 +336,7 @@ function w3l3(){
   B.clear(110,9,111,11).coins(108,10,4);
   /* the galley: planks in the air to walk above a Puffer, then a deep shaft with a second switch for the blue door */
   B.enemy('puffer',118.5,10.2,{rx:2.5}).row(114,12,'============').coins(116,13,8);
-  B.clear(128,8,139,8).row(133,14,'X').enemy('jelly',136,7,{ry:2});
+  B.clear(128,8,139,8).row(133,10,'X').enemy('jelly',136,7,{ry:2});
   B.fill(126,5,127,7,HARD).row(126,2,'UU').row(126,3,'UU').row(126,4,'UU').sign(130,'Hit a switch again: blue blocks open, red ones close.');
   B.shard(115,3).coins(117,3,6);
   B.clear(140,2,141,4).coins(138,3,4);
@@ -349,7 +349,66 @@ function w3l3(){
   B.warp(200,2,'in',true).warp(223,2,'out').fill(206,2,207,3,HARD).fill(217,2,218,3,HARD).coinBox(209,2,215,5).coins(206,4,2).coins(217,4,2).shard(212,8);
   return B.L;
 }
+/* 3-4: the trench. A long way down one shaft, along the bottom past the Snappers' holes, and up the other on a rising
+   current, with a wall across the top so there is no way round. */
+function w3l4(){
+  const B=LevelBuilder(116,'deep',44);
+  B.set('walls',[[78,116,34,44,'rock']]).start(5,34);
+  B.fill(0,0,115,33,GROUND).water(0,0,77,41); w3lid(B,0,77,39);
+  B.sign(9,'The trench. Down, along the bottom, and up the far side.',34).coins(12,35,4).row(15,37,'?M?');
+  /* nothing gets across the top */
+  B.fill(40,34,45,43,GROUND);
+  /* the way down */
+  B.clear(22,6,29,33).coinCol(25,26,7).enemy('jelly',24,28,{ry:1.2,rx:1.5}).row(22,23,'KKK').row(27,19,'KKK').enemy('puffer',25.5,16,{rx:2});
+  B.coinCol(26,9,6).enemy('jelly',27,11,{ry:1.5}).shard(23,7);
+  /* the bottom: three holes with a Snapper in each, and a side cave behind a Jelly */
+  B.clear(22,2,69,6).clear(34,0,35,1).clear(46,0,47,1).clear(56,0,57,1);
+  B.enemy('snapper',34.5,2,{rise:3.6,gap:1.5}).enemy('snapper',46.5,2,{rise:3.6,gap:1.5,phase:0.7}).enemy('snapper',56.5,2,{rise:3.6,gap:1.5,phase:0.3});
+  B.coins(30,4,3).coins(38,4,6).coins(49,4,5).row(41,5,'M').checkpoint(40);
+  B.clear(50,7,53,11).enemy('jelly',51.5,8,{ry:0.8,sp:1.5}).shard(52,10);
+  /* the way up: a current that lifts, with crumbling ledges to rest on and a nook half way */
+  B.clear(62,6,69,33).wind(62,5,65,30,0,26).sign(60,'A rising current. Stop swimming and ride it.');
+  for(let y=8;y<=30;y+=3) B.coins(63,y,2);
+  B.row(67,14,'KKK').row(67,22,'KKK').enemy('puffer',67.5,26,{rx:1.4,sp:0.7}).clear(70,17,73,19).shard(72,17).enemy('jelly',66,18,{ry:1.4});
+  /* out through the air lock, and dry land to the flag */
+  B.fill(76,34,79,43,GROUND).clear(76,34,79,36).coins(70,35,4);
+  B.stairs(84,6,1,34).fill(90,34,90,39,HARD);
+  B.goal(96,34);
+  return B.L;
+}
+
+/* 3-5: the vents. The hardest dive: Jellies and Puffers in pairs, currents that drag toward spikes, and then a dry cave
+   of Clonks to walk through to the flag. */
+function w3l5(){
+  const B=LevelBuilder(268,'deep',20);
+  B.room(0,235).room(240,267,0,19,true).set('cave',true);
+  B.ground(0,239).water(0,0,129,23); w3lid(B,0,129,14);
+  B.coins(6,3,3).row(10,5,'?M?').enemy('snippy',16).enemy('spikit',22);
+  B.fill(28,2,31,19,GROUND).clear(28,7,31,10).coins(28,8,4);
+  /* two Jellies, out of step */
+  B.enemy('jelly',37,7,{ry:3}).enemy('jelly',42,7,{ry:3,sp:1.3}).coins(36,12,3).shard(39.5,13);
+  /* a current that presses down onto spikes: keep swimming */
+  B.sign(45,'This current drags downward. Swim hard.').wind(48,2,62,13,0,-12).spikes(50,60).coins(49,8,13);
+  B.fill(66,2,69,19,GROUND).clear(66,5,69,8).coins(66,6,4);
+  /* two Puffers on guard, one high and one low */
+  B.enemy('puffer',76,5,{rx:2.6}).enemy('puffer',84,10,{rx:2.6,sp:1}).row(79,8,'?M?').coins(74,11,4).coins(82,4,4);
+  B.fill(92,2,95,19,GROUND).clear(92,9,95,12).coins(92,10,4);
+  /* a current that sweeps sideways past spikes on a wall, and a shard in the lee of them */
+  B.wind(98,3,116,12,13,0).fill(118,6,119,13,HARD).row(117,6,'^').row(117,9,'^').row(117,12,'^').enemy('jelly',106,6,{ry:2.4}).shard(112,3).coins(100,4,6);
+  /* the air lock, and the dry cave */
+  B.fill(126,5,133,19,GROUND).coins(127,3,5);
+  B.checkpoint(138);
+  B.row(142,5,'?M?').enemy('clonk',150,8).enemy('spikit',156).enemy('clonk',162,8).enemy('fizzle',168).row(172,5,'B?B');
+  B.enemy('clonk',180,8).enemy('clonk',185,8).enemy('shellby',191).warp(196,2,'in').enemy('clonk',204,8).warp(210,3,'out',true);
+  B.stairs(214,6).fill(220,2,220,7,HARD);
+  B.goal(226);
+  /* a flooded treasure cave at the end of the pipe */
+  B.fill(236,2,239,19,GROUND).fill(240,2,240,19,HARD).fill(267,2,267,19,HARD).fill(240,14,267,19,GROUND).water(241,2,266,12);
+  B.warp(242,2,'in',true).warp(263,2,'out').coinBox(247,4,252,7).enemy('puffer',256,8,{rx:2.5}).shard(258,11).coinBox(256,3,260,4);
+  return B.L;
+}
+
 function w3stub(n){ return ()=>{ const B=LevelBuilder(110,'deep'); B.ground(0,109).water(0,0,78,18).fill(79,2,82,15,GROUND).clear(79,2,82,4).shard(8,3).shard(10,3).shard(12,3);
   if(n===4) B.set('cave',true); if(n===3) B.set('floor',[[-90,20,9],[60,300,9]]); if(n===2) B.set('walls',[[30,60,0,14,'hull']]);
   B.enemy('jelly',20,5,{ry:1}).row(30,5,'?M?').row(40,4,'===').fill(50,2,50,4,HARD).pipe(56,2).goal(95); return B.L; }; }
-defWorld({name:'Fizzy Deep',theme:'deep',levels:[w3l1,w3l2,w3l3,w3stub(3),w3stub(4)]});
+defWorld({name:'Fizzy Deep',theme:'deep',levels:[w3l1,w3l2,w3l3,w3l4,w3l5]});

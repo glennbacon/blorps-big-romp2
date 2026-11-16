@@ -295,13 +295,14 @@ function updatePlayer(dt){
   } else {
     const hold=p.vy>0&&(p.springHold||(p.jumping&&input.jump));
     p.vy-=(hold?p.gHold:p.gFall)*GRAV*dt; if(p.vy<=0) p.springHold=false;
-    const was_=p.glide; p.glide=p.form===3&&input.jump&&p.vy<0&&!p.onGround&&p.launchT<=0;
+    let lifted=false; for(const z of winds) if(z.ay>0&&p.x>z.x0&&p.x<z.x1&&p.y+p.h*0.5>z.y0&&p.y+p.h*0.5<z.y1) lifted=true;
+    const was_=p.glide; p.glide=p.form===3&&input.jump&&(p.vy<0||lifted)&&!p.onGround&&p.launchT<=0;
     if(p.glide){ if(p.vy<-2.7) p.vy=Math.min(-2.7,p.vy+90*dt); if(!was_) sfx.glide(); }
     else if(p.wall&&p.vy<-3.6){ p.vy=-3.6; if(p.dustT<=0){ p.dustT=0.09; dust(p.x+p.wall*p.w/2,p.y+0.5,1,-p.wall*0.3); } }
     if(p.vy<-MAX_FALL) p.vy=-MAX_FALL;
   }
   for(const z of winds) if(p.x>z.x0&&p.x<z.x1&&p.y+p.h*0.5>z.y0&&p.y+p.h*0.5<z.y1&&!p.pound){
-    p.vx+=z.ax*dt; if(z.ay){ p.vy+=z.ay*(p.glide?1.7:1)*dt; if(p.vy>11) p.vy=11; if(p.vy>0) p.jumping=false; } }
+    p.vx+=z.ax*dt; if(z.ay){ p.vy+=z.ay*(p.glide?2.2:1)*dt; if(p.vy>11) p.vy=11; if(p.vy>0) p.jumping=false; } }
 
   /* a tall Blorp who ends up inside a low gap is nudged out instead of sticking */
   p.wall=0;

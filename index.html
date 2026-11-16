@@ -2060,13 +2060,14 @@ function updatePlayer(dt){
   } else {
     const hold=p.vy>0&&(p.springHold||(p.jumping&&input.jump));
     p.vy-=(hold?p.gHold:p.gFall)*GRAV*dt; if(p.vy<=0) p.springHold=false;
-    const was_=p.glide; p.glide=p.form===3&&input.jump&&p.vy<0&&!p.onGround&&p.launchT<=0;
+    let lifted=false; for(const z of winds) if(z.ay>0&&p.x>z.x0&&p.x<z.x1&&p.y+p.h*0.5>z.y0&&p.y+p.h*0.5<z.y1) lifted=true;
+    const was_=p.glide; p.glide=p.form===3&&input.jump&&(p.vy<0||lifted)&&!p.onGround&&p.launchT<=0;
     if(p.glide){ if(p.vy<-2.7) p.vy=Math.min(-2.7,p.vy+90*dt); if(!was_) sfx.glide(); }
     else if(p.wall&&p.vy<-3.6){ p.vy=-3.6; if(p.dustT<=0){ p.dustT=0.09; dust(p.x+p.wall*p.w/2,p.y+0.5,1,-p.wall*0.3); } }
     if(p.vy<-MAX_FALL) p.vy=-MAX_FALL;
   }
   for(const z of winds) if(p.x>z.x0&&p.x<z.x1&&p.y+p.h*0.5>z.y0&&p.y+p.h*0.5<z.y1&&!p.pound){
-    p.vx+=z.ax*dt; if(z.ay){ p.vy+=z.ay*(p.glide?1.7:1)*dt; if(p.vy>11) p.vy=11; if(p.vy>0) p.jumping=false; } }
+    p.vx+=z.ax*dt; if(z.ay){ p.vy+=z.ay*(p.glide?2.2:1)*dt; if(p.vy>11) p.vy=11; if(p.vy>0) p.jumping=false; } }
 
   /* a tall Blorp who ends up inside a low gap is nudged out instead of sticking */
   p.wall=0;
@@ -3069,8 +3070,54 @@ function w2l3(){
   return B.L;
 }
 
+/* 2-4: the ruins. Old stone bridges that crumble underfoot, Prickles lobbing seeds from their pedestals, Chompers in the
+   pipes, and a switch that opens a door through the temple wall. */
+function w2l4(){
+  const B=LevelBuilder(266,'jungle');
+  B.room(0,233).room(238,265,0,15,true);
+  B.ground(0,34).ground(50,84).ground(100,140).ground(156,237);
+  B.coins(6,3,3).row(11,5,'?M?').enemy('blob',16).pipe(21,3,true).enemy('snippy',27);
+  B.sign(31,'These old stones crumble underfoot. Keep moving.');
+  B.row(35,1,'KKKKKKKKKKKKKKK').coins(37,3,11).enemy('snapper',42.5,2,{rise:4,phase:0.6});
+  /* the temple wall: over the top by the planks, or through the red door once the switch is hit */
+  B.fill(54,2,56,4,HARD).enemy('prickle',55,5).row(60,5,'B?X').sign(58,'Hit the switch: red blocks open, and blue ones turn solid.');
+  B.pipe(66,2).row(70,5,'==').row(73,8,'==').coins(70,6,2).coins(73,9,2);
+  B.fill(76,4,77,8,HARD).fill(76,2,77,3,RED).row(80,5,'UU').row(83,8,'UU').shard(84,10).coins(80,6,2);
+  B.row(85,1,'KKKKK').row(92,1,'KKKKKKKK').enemy('snapper',90.5,2,{rise:4.5}).enemy('batty',95,6,{rx:2.5}).coins(86,3,3).coins(93,3,6);
+  B.checkpoint(104);
+  B.row(108,5,'?M?').enemy('boing',112).fill(116,2,118,3,HARD).enemy('prickle',117,4).enemy('rammy',128);
+  B.warp(122,2,'in').warp(134,3,'out',true).arc(140,4,6);
+  B.row(141,1,'KKKK').plat(146,2,3,'x',4,1.2).row(153,1,'KKK').enemy('snapper',145,2,{rise:3.5,phase:1}).coins(147,4,5);
+  B.pipe(162,3,true).enemy('shellby',167).pipe(171,2,true).spring(178).row(181,9,'====').shard(183,12).coins(181,10,4);
+  B.fill(188,2,190,3,HARD).enemy('prickle',189,4).row(194,5,'B?B').enemy('boing',199);
+  B.stairs(206,6).fill(212,2,212,7,HARD);
+  B.goal(218);
+  /* the vault under the temple: stones that crumble as a stair, and a shard at the top of them */
+  B.fill(234,2,237,15,GROUND).ground(238,265).fill(238,2,238,15,HARD).fill(265,2,265,15,HARD);
+  B.warp(240,2,'in',true).warp(261,2,'out').row(246,4,'KK').row(249,6,'KK').row(252,8,'KK').row(255,10,'HH').shard(256,11).coinBox(244,3,245,3).coinBox(257,3,259,5).row(250,3,'?L?');
+  return B.L;
+}
+
+/* 2-5: Big Bongo. A short, lively run of springs and Bonks, then the drum-beater himself: he strolls up, then by turns
+   leaps (the landing sends ripples along the ground) and charges (and stuns himself on the wall). */
+function w2l5(){
+  const B=LevelBuilder(176,'jungle');
+  B.ground(0,40).ground(46,175);
+  B.coins(6,3,3).row(10,5,'?M?').enemy('rammy',19).spring(27).row(30,9,'===').coins(30,10,3).shard(31,13).arc(40,4,7);
+  B.enemy('boing',52).row(56,5,'B?B').enemy('rammy',66).fill(72,2,73,4,BRICK).pipe(78,3,true);
+  /* two pillars to kick up between */
+  B.fill(86,4,86,11,HARD).fill(90,4,90,11,HARD).coinCol(88,4,5).shard(88,10);
+  /* a brick-roofed box: pound in from the top once big, or look round the back */
+  B.fill(96,2,96,5,HARD).fill(100,4,100,5,HARD).row(97,5,'BBB').row(97,4,'BBB').shard(98,2).fill(95,2,95,3,HARD);
+  B.checkpoint(106);
+  B.row(110,5,'?M?').sign(113,'Big Bongo! Jump his ripples, and stomp him when he is dizzy, or any time you dare.');
+  B.row(124,5,'===').row(146,5,'===').fill(159,2,175,13,GROUND);
+  B.boss(144,120,155,9,'bongo');
+  return B.L;
+}
+
 function w2stub(last){ return ()=>{ const B=LevelBuilder(120,'jungle'); B.ground(0,119).shard(8,3).shard(10,3).shard(12,3); if(last) B.fill(100,2,119,13,GROUND).boss(80,60,95,9,'bongo'); else B.goal(100); return B.L; }; }
-defWorld({name:'Jellybean Jungle',theme:'jungle',levels:[w2l1,w2l2,w2l3,w2stub(),w2stub(true)]});
+defWorld({name:'Jellybean Jungle',theme:'jungle',levels:[w2l1,w2l2,w2l3,w2l4,w2l5]});
 /* ================= World 3: Fizzy Deep ================= */
 /* Under the sea. Nearly all of every level is flooded, so Blorp swims: monsters cannot be stomped and must be swum
    around, currents push him about, and air is only found on a pier, a beach and in a few caves. The "sky" is the water
@@ -3409,7 +3456,7 @@ function w3l3(){
   B.clear(110,9,111,11).coins(108,10,4);
   /* the galley: planks in the air to walk above a Puffer, then a deep shaft with a second switch for the blue door */
   B.enemy('puffer',118.5,10.2,{rx:2.5}).row(114,12,'============').coins(116,13,8);
-  B.clear(128,8,139,8).row(133,14,'X').enemy('jelly',136,7,{ry:2});
+  B.clear(128,8,139,8).row(133,10,'X').enemy('jelly',136,7,{ry:2});
   B.fill(126,5,127,7,HARD).row(126,2,'UU').row(126,3,'UU').row(126,4,'UU').sign(130,'Hit a switch again: blue blocks open, red ones close.');
   B.shard(115,3).coins(117,3,6);
   B.clear(140,2,141,4).coins(138,3,4);
@@ -3422,10 +3469,69 @@ function w3l3(){
   B.warp(200,2,'in',true).warp(223,2,'out').fill(206,2,207,3,HARD).fill(217,2,218,3,HARD).coinBox(209,2,215,5).coins(206,4,2).coins(217,4,2).shard(212,8);
   return B.L;
 }
+/* 3-4: the trench. A long way down one shaft, along the bottom past the Snappers' holes, and up the other on a rising
+   current, with a wall across the top so there is no way round. */
+function w3l4(){
+  const B=LevelBuilder(116,'deep',44);
+  B.set('walls',[[78,116,34,44,'rock']]).start(5,34);
+  B.fill(0,0,115,33,GROUND).water(0,0,77,41); w3lid(B,0,77,39);
+  B.sign(9,'The trench. Down, along the bottom, and up the far side.',34).coins(12,35,4).row(15,37,'?M?');
+  /* nothing gets across the top */
+  B.fill(40,34,45,43,GROUND);
+  /* the way down */
+  B.clear(22,6,29,33).coinCol(25,26,7).enemy('jelly',24,28,{ry:1.2,rx:1.5}).row(22,23,'KKK').row(27,19,'KKK').enemy('puffer',25.5,16,{rx:2});
+  B.coinCol(26,9,6).enemy('jelly',27,11,{ry:1.5}).shard(23,7);
+  /* the bottom: three holes with a Snapper in each, and a side cave behind a Jelly */
+  B.clear(22,2,69,6).clear(34,0,35,1).clear(46,0,47,1).clear(56,0,57,1);
+  B.enemy('snapper',34.5,2,{rise:3.6,gap:1.5}).enemy('snapper',46.5,2,{rise:3.6,gap:1.5,phase:0.7}).enemy('snapper',56.5,2,{rise:3.6,gap:1.5,phase:0.3});
+  B.coins(30,4,3).coins(38,4,6).coins(49,4,5).row(41,5,'M').checkpoint(40);
+  B.clear(50,7,53,11).enemy('jelly',51.5,8,{ry:0.8,sp:1.5}).shard(52,10);
+  /* the way up: a current that lifts, with crumbling ledges to rest on and a nook half way */
+  B.clear(62,6,69,33).wind(62,5,65,30,0,26).sign(60,'A rising current. Stop swimming and ride it.');
+  for(let y=8;y<=30;y+=3) B.coins(63,y,2);
+  B.row(67,14,'KKK').row(67,22,'KKK').enemy('puffer',67.5,26,{rx:1.4,sp:0.7}).clear(70,17,73,19).shard(72,17).enemy('jelly',66,18,{ry:1.4});
+  /* out through the air lock, and dry land to the flag */
+  B.fill(76,34,79,43,GROUND).clear(76,34,79,36).coins(70,35,4);
+  B.stairs(84,6,1,34).fill(90,34,90,39,HARD);
+  B.goal(96,34);
+  return B.L;
+}
+
+/* 3-5: the vents. The hardest dive: Jellies and Puffers in pairs, currents that drag toward spikes, and then a dry cave
+   of Clonks to walk through to the flag. */
+function w3l5(){
+  const B=LevelBuilder(268,'deep',20);
+  B.room(0,235).room(240,267,0,19,true).set('cave',true);
+  B.ground(0,239).water(0,0,129,23); w3lid(B,0,129,14);
+  B.coins(6,3,3).row(10,5,'?M?').enemy('snippy',16).enemy('spikit',22);
+  B.fill(28,2,31,19,GROUND).clear(28,7,31,10).coins(28,8,4);
+  /* two Jellies, out of step */
+  B.enemy('jelly',37,7,{ry:3}).enemy('jelly',42,7,{ry:3,sp:1.3}).coins(36,12,3).shard(39.5,13);
+  /* a current that presses down onto spikes: keep swimming */
+  B.sign(45,'This current drags downward. Swim hard.').wind(48,2,62,13,0,-12).spikes(50,60).coins(49,8,13);
+  B.fill(66,2,69,19,GROUND).clear(66,5,69,8).coins(66,6,4);
+  /* two Puffers on guard, one high and one low */
+  B.enemy('puffer',76,5,{rx:2.6}).enemy('puffer',84,10,{rx:2.6,sp:1}).row(79,8,'?M?').coins(74,11,4).coins(82,4,4);
+  B.fill(92,2,95,19,GROUND).clear(92,9,95,12).coins(92,10,4);
+  /* a current that sweeps sideways past spikes on a wall, and a shard in the lee of them */
+  B.wind(98,3,116,12,13,0).fill(118,6,119,13,HARD).row(117,6,'^').row(117,9,'^').row(117,12,'^').enemy('jelly',106,6,{ry:2.4}).shard(112,3).coins(100,4,6);
+  /* the air lock, and the dry cave */
+  B.fill(126,5,133,19,GROUND).coins(127,3,5);
+  B.checkpoint(138);
+  B.row(142,5,'?M?').enemy('clonk',150,8).enemy('spikit',156).enemy('clonk',162,8).enemy('fizzle',168).row(172,5,'B?B');
+  B.enemy('clonk',180,8).enemy('clonk',185,8).enemy('shellby',191).warp(196,2,'in').enemy('clonk',204,8).warp(210,3,'out',true);
+  B.stairs(214,6).fill(220,2,220,7,HARD);
+  B.goal(226);
+  /* a flooded treasure cave at the end of the pipe */
+  B.fill(236,2,239,19,GROUND).fill(240,2,240,19,HARD).fill(267,2,267,19,HARD).fill(240,14,267,19,GROUND).water(241,2,266,12);
+  B.warp(242,2,'in',true).warp(263,2,'out').coinBox(247,4,252,7).enemy('puffer',256,8,{rx:2.5}).shard(258,11).coinBox(256,3,260,4);
+  return B.L;
+}
+
 function w3stub(n){ return ()=>{ const B=LevelBuilder(110,'deep'); B.ground(0,109).water(0,0,78,18).fill(79,2,82,15,GROUND).clear(79,2,82,4).shard(8,3).shard(10,3).shard(12,3);
   if(n===4) B.set('cave',true); if(n===3) B.set('floor',[[-90,20,9],[60,300,9]]); if(n===2) B.set('walls',[[30,60,0,14,'hull']]);
   B.enemy('jelly',20,5,{ry:1}).row(30,5,'?M?').row(40,4,'===').fill(50,2,50,4,HARD).pipe(56,2).goal(95); return B.L; }; }
-defWorld({name:'Fizzy Deep',theme:'deep',levels:[w3l1,w3l2,w3l3,w3stub(3),w3stub(4)]});
+defWorld({name:'Fizzy Deep',theme:'deep',levels:[w3l1,w3l2,w3l3,w3l4,w3l5]});
 /* ================= World 4: Spooky Hollow ================= */
 /* A haunted wood at night, playful-spooky. The moon is gone, so the light comes from what glows: lanterns on crooked
    posts, pumpkins, candles on gravestones, mushrooms, will-o'-wisps and the green bog in the pits (deadly). The world of
@@ -3675,8 +3781,50 @@ function w4l3(){
   return B.L;
 }
 
+/* 4-4: the manor. Indoors by candlelight: Clonks over the corridors, ghosts in the long hall, and a cellar of three
+   pipes of which only one leads on. */
+function w4l4(){
+  const B=LevelBuilder(266,'hollow');
+  B.room(0,233).room(238,265,0,15,true).set('w4in',[24,196]);
+  B.ground(0,237).fill(24,12,196,15,GROUND).fill(24,5,25,11,HARD).fill(195,5,196,11,HARD);
+  B.coins(6,3,3).row(11,5,'?M?').enemy('boing',17).sign(21,'The manor. Clonks wait over the corridors: let them drop, then pass.');
+  B.enemy('clonk',33,8).row(38,5,'?B?').enemy('clonk',45,8).enemy('ghost',54,6).enemy('spikit',58).coins(48,3,4);
+  B.fill(66,5,67,11,HARD).row(72,5,'B?B').row(76,8,'===').shard(77,9).coins(76,9,1).enemy('fizzle',84).enemy('ghost',90,3).enemy('clonk',97,8);
+  /* the cellar door: three pipes. The first leads back, the last to a cupboard, the middle one on. */
+  B.fill(104,5,105,11,HARD).sign(107,'Three pipes. One of them is the way on.');
+  B.warp(111,2,'back').warp(117,2,'on').warp(123,2,'cup').fill(129,2,130,11,HARD).warp(70,2,'back',true).warp(134,2,'on',true).warp(100,2,'cup2',true);
+  B.checkpoint(140);
+  B.row(144,5,'BMB').enemy('ghost',150,7).enemy('shellby',154).enemy('ghost',160,2.5);
+  /* a shard on a shelf that only a bounce off a Clonk's head will reach */
+  B.enemy('clonk',167,7).row(170,9,'HHH').shard(171,10).enemy('ghost',178,6).enemy('spikit',183).row(187,5,'?I?');
+  B.stairs(204,6).fill(210,2,210,7,HARD);
+  B.goal(216);
+  /* the cupboard under the stairs: a ghost, a great many coins, and the third shard */
+  B.fill(234,2,237,15,GROUND).ground(238,265).fill(238,2,238,15,HARD).fill(265,2,265,15,HARD).fill(238,12,265,15,GROUND);
+  B.warp(240,2,'cup',true).warp(261,2,'cup2').coinBox(245,3,256,5).enemy('ghost',258,8).row(249,8,'=====').shard(251,9).row(246,5,'=');
+  return B.L;
+}
+
+/* 4-5: Count Boohoo. A short run through the manor's garden, then the Count: he fades out and drifts overhead where
+   nothing can touch him, shows himself, swoops low across the room, and sits winded on the floor for a moment. */
+function w4l5(){
+  const B=LevelBuilder(176,'hollow');
+  B.ground(0,34).ground(40,70).ground(76,175);
+  B.coins(6,3,3).row(10,5,'?M?').enemy('ghost',18,6).enemy('spikit',22).row(27,4,'==').row(30,7,'==').shard(31,10).coins(27,5,2);
+  B.plat(35,2,3,'x',2,1.2).enemy('batty',46,6,{rx:2.5}).enemy('fizzle',52).row(56,5,'B?B').enemy('ghost',62,3).arc(70,4,7);
+  /* a switch, a blue stair it builds, and a shard at the top of the stair */
+  B.row(80,5,'X').row(84,4,'U').row(87,6,'U').row(90,8,'UU').shard(91,10).coins(84,5,1).coins(87,7,1);
+  /* two gateposts to kick up between */
+  B.fill(96,4,96,11,HARD).fill(100,4,100,11,HARD).coinCol(98,4,5).shard(98,10);
+  B.checkpoint(106);
+  B.row(110,5,'?M?').sign(113,'Count Boohoo! Nothing can touch him while he is faded. Wait for the swoop, then jump on him while he gets his breath.');
+  B.fill(159,2,175,13,GROUND);
+  B.boss(144,120,155,9,'boohoo');
+  return B.L;
+}
+
 function w4stub(last){ return ()=>{ const B=LevelBuilder(120,'hollow'); B.ground(0,119).shard(8,3).shard(10,3).shard(12,3); if(last) B.fill(100,2,119,13,GROUND).boss(80,60,95,9,'boohoo'); else B.goal(100); return B.L; }; }
-defWorld({name:'Spooky Hollow',theme:'hollow',levels:[w4l1,w4l2,w4l3,w4stub(),w4stub(true)]});
+defWorld({name:'Spooky Hollow',theme:'hollow',levels:[w4l1,w4l2,w4l3,w4l4,w4l5]});
 /* ================= World 5: Tick-Tock Works ================= */
 /* A clockwork toy factory. Indoors a wall of panels stands close behind the lane, hung with turning cogs, pipes,
    lamps and furnace windows; a level marked `roof` is out on the rooftops instead, with the city behind. This is the
@@ -3921,10 +4069,197 @@ function w5l5(){
 
 defWorld({name:'Tick-Tock Works',theme:'works',levels:[w5l1,w5l2,w5l3,w5l4,w5l5]});
 /* ================= World 6: Cloud Nine ================= */
-/* PLACEHOLDER: stands in for the real world until it is written, so the map and the checks have all forty levels. */
-THEMES.clouds=Object.assign({},THEMES.shores,{music:'clouds'});
-function w6stub(last){ return ()=>{ const B=LevelBuilder(120,'clouds'); B.ground(0,119).shard(8,3).shard(10,3).shard(12,3); if(last) B.fill(100,2,119,13,GROUND).boss(80,60,95,12,'zappa'); else B.goal(100); return B.L; }; }
-defWorld({name:'Cloud Nine',theme:'clouds',levels:[w6stub(),w6stub(),w6stub(),w6stub(),w6stub(true)]});
+/* Islands in the sky. There is nothing underneath: the pits are open air, and a fall is the end. This is the world of
+   candyfloss, which gives a second jump and a glide; of rising winds that carry Blorp up; and of Zappy the storm cloud.
+   Every level can be finished without candyfloss: gliding only makes it easier, and opens the secrets. */
+function dW6Pinwheel(c){ return [[-0.3,0,-0.3,0.6,7,0.6,'#f4ead0'],[-2.4,6.4,0,2.4,0.9,0.3,c],[0,7,0,2.4,0.9,0.3,WHITE],[-0.45,7,0,0.9,2.4,0.3,c],[-0.45,4.6,0,0.9,2.4,0.3,WHITE],[-0.5,6.4,0.3,1,1,0.3,'#ffd23e']]; }
+function dW6Grass(){ const g='#7fe06a',d='#55c94f'; return [[-1.8,0,0,0.7,3.4,0.7,d],[-0.6,0,0.3,0.7,5,0.7,g],[0.6,0,-0.2,0.7,4,0.7,d],[1.7,0,0.2,0.6,2.6,0.6,g]]; }
+function dW6Bush(c){ const g='#55c94f',l='#8ff07f'; return [[-3,0,-2,6,3,4,g],[-2,3,-1.4,4,1.4,2.8,l],[-2.2,1.4,2,1,1,0.4,c],[0.8,2,2,1,1,0.4,c],[-0.4,0.6,2,1,1,0.4,c],[2.2,2.6,-0.4,0.9,0.9,0.9,c]]; }
+function dW6Shrine(){ const s='#e6f0ff',d='#a9c0e6'; return [[-3,0,-2.5,6,1,5,d],[-2.4,1,-2,0.9,5,0.9,s],[1.5,1,-2,0.9,5,0.9,s],[-2.4,1,1.1,0.9,5,0.9,s],[1.5,1,1.1,0.9,5,0.9,s],[-3.2,6,-2.7,6.4,1,5.4,'#ff8fc7'],[-2.2,7,-1.8,4.4,0.9,3.6,'#ff8fc7'],[-0.6,1,-0.6,1.2,1.6,1.2,'#ffd23e']]; }
+function dW6Mill(c){ const w='#fff6e6', b=[[-2.5,0,-2.5,5,9,5,w],[-2,9,-2,4,3,4,w],[-3,12,-3,6,1.2,6,c],[-2,13.2,-2,4,1.2,4,c],[-0.8,3,2.5,1.6,3,0.2,'#8a5a3c'],[-0.5,9.5,2,1,1,1.4,'#8a5a3c']];
+  for(const q of [[1,0],[-1,0],[0,1],[0,-1]]) b.push([q[0]*4-(q[0]?2.5:0.5),10+q[1]*4-(q[1]?2.5:0.5),3.4,q[0]?5:1,q[1]?5:1,0.3,'#ffe9c2']); return b; }
+function dW6Vane(){ return [[-0.3,0,-0.3,0.6,9,0.6,'#a9c0e6'],[-3,7.6,-0.2,6,0.5,0.4,'#e6f0ff'],[2,7,-0.2,1.6,1.7,0.4,'#ff4f7b'],[-0.7,9,-0.7,1.4,1.4,1.4,'#ffd23e']]; }
+function dW6Puff(){ return [[-3,0,-2,6,1.6,4,WHITE],[-1.8,1.6,-1.4,3.6,1.2,2.8,WHITE],[-1.2,0.5,2,0.6,0.7,0.12,INK],[0.6,0.5,2,0.6,0.7,0.12,INK]]; }
+/* a floating island far off, a bank of cloud, and a rainbow: all in tiles */
+function w6Isle(far,x,y,z,w,R){ const g=pick(R,['#7fe06a','#6fd65e','#8fe87a']), c=pick(R,['#f0e2c4','#e6d6b4']);
+  far.push([x-w/2,y,z-w*0.3,w,0.8,w*0.6,g],[x-w*0.42,y-1.6,z-w*0.25,w*0.84,1.6,w*0.5,c],[x-w*0.3,y-3.4,z-w*0.2,w*0.6,1.8,w*0.4,shade(c,0.9)],[x-w*0.15,y-5,z-w*0.12,w*0.3,1.6,w*0.24,shade(c,0.8)]);
+  if(R()<0.6) far.push([x-0.3,y+0.8,z,0.6,2.4,0.6,'#a5642f'],[x-1.6,y+3,z-1.2,3.2,2,2.4,pick(R,['#ff8fc7','#ffd23e','#5fe0d0'])]);
+  return [x+w*0.3,y]; }
+function w6Bank(list,x0,x1,y,z,d,R,c){ for(let x=x0;x<x1;){ const w=5+R()*7, h=1.2+R()*1.6; list.push([x,y-6,z-d,w,6+h,d,c]); if(R()<0.6) list.push([x+w*0.2,y+h,z-d*0.8,w*0.5,0.7+R()*0.8,d*0.6,c]); x+=w*0.82; } }
+function w6Rainbow(list,cx,cy,z,r){ const cols=['#ff5a5f','#ffa23e','#ffe14d','#6fe06a','#4db8ff','#9b6de5'];
+  cols.forEach((c,k)=>{ const rr=r-k*0.9; for(let i=0;i<=26;i++){ const a=Math.PI*i/26; list.push([cx+Math.cos(a)*rr-0.9,cy+Math.sin(a)*rr-0.45,z,1.8,0.9,0.4,c]); } }); }
+
+THEMES.clouds={ music:'clouds',
+  sky:['#2f86f0','#8fd0ff','#fff3e0'], skyMid:0.48, glowCol:0xfff3c0, sunGlow:0.9,
+  fog:0xdff1ff, fogNear:18, fogFar:150,
+  hemiSky:0xffffff, hemiGround:0xc9d9f0, hemiI:0.66, sunI:0.62, sunCol:0xfff6e0, sunDir:[-0.42,0.78,0.5],
+  top:'#7fe06a', topS:['#8ff07f','#6fd65e','#9af58a','#74dc64'], dirt:'#f0e2c4', dirtS:['#e6d6b4','#f7ecd4','#dccaa4'], cap:'#7fe06a', capL:'#b4f59a', capD:'#4aa84a',
+  brick:['#ff9ec4','#d05a8a','#ffd0e4'], hard:['#e6f0ff','#ffffff','#a9c0e6'], pipe:['#ffc928','#fff0a8','#c98a00','#6b4a00'],
+  semi:'cloud', plat:['#ffd166','#d98f24'], dust:'#ffffff', back:-4, fringe:['#7fe06a','#55c94f','#b4f59a'],
+  liquid:{kind:'void'}, disc:['#ffe14d','#fff3a0','#e08a12'], cloud:'#ffffff', bank:'#f4faff', bloom:0.85, hi:0.1,
+  looks:[null,
+    {sky:['#5a9cf5','#c2e4ff','#ffe9f4'],fog:0xeaf3ff,bank:'#fff4fb',rainbows:3},
+    {sky:['#f08a5c','#ffc890','#fff0c2'],fog:0xffe0bc,sunCol:0xffc890,hemiSky:0xffe6d0,glowCol:0xffa060,sunDir:[-0.66,0.45,0.5],disc:['#ff9a3d','#ffd27a','#b3520f'],cloud:'#ffd9c0',bank:'#ffe2c8'},
+    {sky:['#2a3350','#55607f','#8a94aa'],fog:0x6a7490,fogFar:110,hemiSky:0xc9d4f0,hemiGround:0x6a7490,hemiI:0.6,sunI:0.5,sunCol:0xd0dcff,sunGlow:0.2,cloud:'#7a84a2',bank:'#8a94b0',storm:true},
+    {sky:['#241a4a','#5a3a7a','#c96a6a'],fog:0x6a4a80,fogFar:120,hemiSky:0xe0c8ff,hemiGround:0x6a4a80,hemiI:0.58,sunI:0.56,sunCol:0xffc0a0,glowCol:0xff7a5a,sunDir:[-0.6,0.5,0.5],disc:['#ff7a4d','#ffb37a','#a8320f'],cloud:'#8a6aa0',bank:'#9a7ab0',storm:true,stars:0.4}],
+  scenery(S,R){
+    const W=S.W, H=S.H, far=S.far, soft=S.soft, bank=TH.bank;
+    /* the sea of cloud: one bank in front of the lane's feet, one close behind, and others out to the horizon */
+    w6Bank(soft,-30,W+30,0.2,2.6,0.9,R,bank); w6Bank(soft,-30,W+30,0.7,-4.3,2.5,R,bank);
+    for(const q of [[-9,1.5],[-16,2.2],[-26,3],[-40,3.6],[-60,4.4]]) w6Bank(soft,-60,W+60,q[1],q[0],5,R,shade(bank,0.97));
+    soft.push([-80,-9,-90,W+160,10.5,86,shade(bank,0.95)]);
+    /* far islands, each with a waterfall that spills into nothing; towers of cumulus; rainbows */
+    for(let x=-30;x<W+30;x+=22+R()*26){ const z=-18-R()*34, y=4+R()*9, e=w6Isle(far,x,y,z,6+R()*8,R); if(R()<0.5) S.glowFar.push([e[0],y-7,z+1.5,0.7,7.4,0.3,'#bfeaff']); }
+    for(let x=-50;x<W+50;x+=30+R()*30){ const z=-64-R()*16; let w=16+R()*12, y=2; for(let k=0;k<5;k++){ soft.push([x-w/2,y,z,w,3.4,6,TH.cloud]); y+=3.4; w*=0.74; } }
+    for(let i=0;i<(TH.rainbows||1);i++) w6Rainbow(soft,W*(i+0.5)/(TH.rainbows||1)+(R()-0.5)*20,1,-58,20+R()*8);
+    for(let x=-50;x<W+50;x+=8+R()*9) S.addCloud(x,5+R()*(H-4),-10-R()*46,R,TH.cloud==='#ffffff'?undefined:TH.cloud);
+    for(let x=10;x<W;x+=40+R()*30) S.addCloud(x,3+R()*3,-5.6,R,TH.cloud==='#ffffff'?undefined:TH.cloud,0.6);
+    if(!TH.storm||TH.stars) skyDisc(TH.disc,null,14.5);
+    /* balloons that drift and bob, and birds */
+    for(let i=0;i<Math.ceil(W/50);i++){ const c=pick(R,['#ff4f7b','#ffd23e','#2fd6c3','#b58cff']), c2=pick(R,[WHITE,'#fff0a8']);
+      const m=new T.Mesh(tmpGeo(voxGeo([[-1.5,2,-1.5,3,3,3,c],[-1.2,5,-1.2,2.4,0.8,2.4,c],[-1.2,1.2,-1.2,2.4,0.8,2.4,c],[-1.55,3,-0.5,3.1,1,1,c2],[-0.5,3,-1.55,1,1,3.1,c2],[-0.5,-0.4,-0.5,1,0.8,1,'#b07f48'],[-0.45,0.4,-0.05,0.1,0.9,0.1,INK],[0.35,0.4,-0.05,0.1,0.9,0.1,INK]],1)),MAT.vox);
+      const z=-12-R()*26, y0=7+R()*8, v=(R()<0.5?-1:1)*(0.25+R()*0.4), ph=R()*9; m.position.set(R()*W,y0,z); world.add(m);
+      critters.push({tick(dt,time){ m.position.x+=v*dt; if(m.position.x>W+40) m.position.x=-40; else if(m.position.x<-40) m.position.x=W+40; m.position.y=y0+Math.sin(time*0.6+ph)*0.7; m.rotation.z=Math.sin(time*0.8+ph)*0.05; }}); }
+    for(let i=0;i<Math.ceil(W/36);i++){ const g=new T.Group(), wl=new T.Mesh(geo('w6bL',()=>[[-4,0,-0.8,4,0.5,1.6,'#3a4a6a']]),MAT.soft), wr=new T.Mesh(geo('w6bR',()=>[[0,0,-0.8,4,0.5,1.6,'#3a4a6a']]),MAT.soft);
+      g.add(new T.Mesh(geo('w6b',()=>[[-0.8,-0.5,-1.8,1.6,1.1,3.6,'#3a4a6a'],[-0.4,-0.2,1.8,0.8,0.5,0.8,'#ffb347']]),MAT.soft),wl,wr);
+      const z=-8-R()*14, y0=8+R()*(H-9), v=2+R()*1.6, ph=R()*9; g.position.set(R()*W,y0,z); g.rotation.y=Math.PI/2; world.add(g);
+      critters.push({tick(dt,time){ g.position.x+=v*dt; if(g.position.x>W+30) g.position.x=-30; g.position.y=y0+Math.sin(time*0.7+ph)*0.8; const f=Math.sin(time*8+ph)*0.6; wl.rotation.z=-f; wr.rotation.z=f; }}); }
+    S.addMotes(0xffffff,TH.storm?90:40,TH.storm?0.1:0.08,TH.storm?1.4:0);
+  },
+  decor(S,D,R){
+    const r=R(), y=D.ty*8;
+    if(r<0.05&&D.free(3)&&D.open) put(S.flora,dW6Mill(pick(R,['#ff4f7b','#5fd0ff','#ffd23e'])),D.jx(),y,D.zb(2.2,3.2),0.12);
+    else if(r<0.1&&D.free(2)&&D.open) put(S.flora,dW6Vane(),D.jx(),y,D.zb(1.5,3.4),0.3);
+    else if(r<0.14) put(S.near,dW6Shrine(),D.jx(),y,D.zb(2,3.2));
+    else if(r<0.24) put(S.flora,dW6Pinwheel(pick(R,['#ff4f7b','#5fd0ff','#ffd23e','#b58cff'])),D.jx(),y,D.zb(1.3,3.6),2.4);
+    else if(r<0.34) put(S.near,dW6Bush(pick(R,['#ff8fc7','#b58cff','#ffd23e'])),D.jx(),y,D.zb(1.4,3.5));
+    else if(r<0.52) put(S.flora,dW6Grass(),D.jx(),y,D.zb(1.2,3.7),2.6);
+    else if(r<0.6) put(S.near,dFlower(pick(R,['#ff8fc7','#ffffff','#ffe14d'])),D.jx(),y,D.zb(1.2,3.6));
+    else if(r<0.65) put(S.near,dW6Puff(),D.jx(),y,D.zb(1.5,3.5));
+    const f=R(); if(f<0.14) put(S.near,dFlower(pick(R,['#ff8fc7','#ffffff'])),D.jx(),y,D.zf()); else if(f<0.2) put(S.near,dRock('#e6f0ff'),D.jx(),y,D.zf());
+  }
+};
+
+/* 6-1: cloud hopping. Islands, cloud ledges and springs, and the first candyfloss, over a long gap where gliding is
+   simply a joy (and stepping stones for those who would rather walk). */
+function w6l1(){
+  const B=LevelBuilder(254,'clouds');
+  B.room(0,223).room(228,253,0,15,true);
+  B.ground(0,26).ground(32,50).ground(58,74).ground(104,130).ground(138,160).ground(170,227);
+  B.sign(5,'Mind the edge: there is nothing down there but sky.').coins(8,3,3).row(12,5,'?M?').enemy('blob',17).enemy('boing',22).arc(26,4,7);
+  B.row(36,5,'B?B').enemy('batty',41,7,{rx:2.5}).spring(46).row(49,8,'====').coins(49,9,4).shard(51,12).row(53,2,'===').coins(54,4,1);
+  B.enemy('blob',62).sign(64,'Candyfloss! Jump again in the air, and hold {jump} to glide.').row(67,5,'BFB');
+  /* the long gap: stepping stones below, and coins strung along the glide above */
+  B.row(77,3,'===').row(83,5,'===').row(89,3,'===').row(95,5,'===').row(100,3,'===');
+  for(let i=0;i<13;i++) B.coins(77+i*2,10-Math.round(i*0.35),1);
+  B.checkpoint(108);
+  B.row(112,5,'?F?').enemy('prickle',118).enemy('boing',124).sign(127,'This ledge drops soon after Blorp lands.').fall(132,2,4);
+  B.sign(140,'Zappy drops bolts. He can be stomped, by anyone who gets above him.').enemy('zappy',148,7,{rx:5}).spring(152).row(155,5,'B?B').enemy('batty',158,9,{rx:2});
+  /* a shard high over the gap, for a second jump */
+  B.row(163,2,'====').shard(165,10,'fluff').coins(163,4,4);
+  B.row(175,5,'?F?').enemy('blob',179).warp(183,2,'in').enemy('boing',189).warp(194,3,'out',true);
+  B.stairs(198,6).fill(204,2,204,7,HARD);
+  B.goal(210);
+  /* a cloud garden: springs, and a shard at the top of the tallest bounce */
+  B.fill(224,2,227,15,GROUND).ground(228,253).fill(228,2,228,15,HARD).fill(253,2,253,15,HARD);
+  B.warp(230,2,'in',true).warp(249,2,'out').spring(237).spring(243).row(239,9,'===').shard(240,13).coinCol(237,4,5).coinCol(243,4,5).coins(239,10,3);
+  return B.L;
+}
+
+/* 6-2: updraft alley. Rising winds that lift Blorp from island to island, a gust that carries a jump further, and a
+   gentler wind that only a glider can ride. */
+function w6l2(){
+  const B=LevelBuilder(252,'clouds',26);
+  B.room(0,221,0,25).room(226,251,0,15,true);
+  B.ground(0,24).ground(54,76).ground(90,120).ground(166,225);
+  B.coins(6,3,3).row(10,5,'?M?').enemy('blob',15).sign(18,'A rising wind. Jump in, and let it carry you up.');
+  B.wind(26,2,29,13,0,110).coinCol(27,4,7).fill(31,8,48,9,GROUND).row(36,13,'?F?').enemy('blob',42,10).enemy('boing',46,10).shard(33,15);
+  B.row(50,6,'==').coins(50,7,2).enemy('prickle',60).row(64,5,'B?B').enemy('batty',69,7,{rx:2.5});
+  /* a tailwind over a wide gap, with a stone in the middle for the cautious */
+  B.sign(72,'A gust! Jump, and it carries you further.').wind(77,2,89,10,16,0).row(81,2,'====').coins(78,5,10);
+  B.checkpoint(94);
+  B.row(98,5,'?F?').enemy('zappy',104,8,{rx:5}).sign(107,'A gentle wind lifts only a glider: hold {jump} in it.');
+  B.wind(110,2,113,16,0,60).shard(111,16,'fluff').coinCol(111,5,9).enemy('boing',117);
+  /* two lifts, one above the other */
+  B.wind(122,2,125,13,0,110).fill(127,9,137,10,GROUND).enemy('prickle',132,11).coins(128,12,3);
+  B.wind(139,11,142,21,0,110).fill(144,16,160,17,GROUND).row(148,21,'?M?').enemy('zappy',152,22,{rx:5}).warp(156,2,'in',false,18).coins(161,14,3).coins(163,10,2).coins(165,6,2);
+  B.enemy('boing',172).warp(176,3,'out',true).enemy('prickle',181).sign(183,'A headwind. Run at it.').wind(185,2,195,9,-13,0).coins(186,3,8);
+  B.stairs(198,6).fill(204,2,204,7,HARD);
+  B.goal(210);
+  /* a wind chimney: a gentle wind, a ring of coins, and the shard at the top for a glider (or a wall kicker) */
+  B.fill(222,2,225,15,GROUND).ground(226,251).fill(226,2,226,15,HARD).fill(251,2,251,15,HARD);
+  B.warp(228,2,'in',true).warp(247,2,'out').fill(235,5,235,12,HARD).fill(239,5,239,12,HARD).wind(236,2,238,13,0,60).coinCol(237,3,8).shard(237,12).coinBox(241,3,244,4);
+  return B.L;
+}
+
+/* 6-3: the rainbow bridge. Hardly any ground at all: bridges of cloud brick that crumble, ledges that fall, ledges
+   that slide, and Zappys overhead. */
+function w6l3(){
+  const B=LevelBuilder(232,'clouds');
+  B.ground(0,20).ground(96,116).ground(188,231);
+  B.coins(6,3,3).row(10,5,'?M?').enemy('blob',15).sign(18,'Cloud bricks crumble underfoot. Do not stop.');
+  B.row(21,1,'KKKKKKKKKKKK').coins(22,3,10).fall(34,2,3).fall(39,3,3).row(44,3,'KKKKKK').coins(45,5,4).enemy('zappy',40,9,{rx:6});
+  B.plat(51,3,3,'x',5,1.1).row(61,2,'KKKKK').row(66,2,'===').shard(67,7).row(64,5,'?').coins(52,5,5);
+  B.fall(70,2,3).fall(75,2,3).row(80,1,'KKKKKKK').plat(88,2,3,'x',4,1.2).enemy('batty',84,6,{rx:3}).coins(81,3,5);
+  B.checkpoint(100);
+  B.row(104,5,'?F?').enemy('boing',109).enemy('prickle',113);
+  B.row(117,1,'KKKKKKKK').enemy('zappy',124,8,{rx:6}).fall(126,2,3).fall(131,3,3).fall(136,4,3).row(141,4,'KKKKKK').coins(142,6,4);
+  /* a shard under the bridge: drop to the ledge below, and spring back */
+  B.row(146,1,'=====').shard(147,2).spring(150,2).coins(150,5,1);
+  B.plat(152,3,3,'y',3,1.2).row(157,5,'KKKKK').plat(163,4,3,'x',5,1).row(172,3,'KKKKK').fall(178,2,3).fall(183,2,3).enemy('zappy',170,10,{rx:7}).coins(158,7,3).coins(173,5,3);
+  /* a high shard over the last bridge, for a second jump */
+  B.shard(175,11,'fluff');
+  B.row(192,5,'B?B').enemy('blob',196).enemy('boing',200);
+  B.stairs(204,6).fill(210,2,210,7,HARD);
+  B.goal(216);
+  return B.L;
+}
+
+/* 6-4: storm front. Zappys in pairs, cannons on the islands, a headwind, a climb up a thunderhead, and a long way down
+   the far side (a glide, for those who kept their candyfloss; a stair, for those who did not). */
+function w6l4(){
+  const B=LevelBuilder(258,'clouds',32);
+  B.room(0,227,0,31).room(232,257,0,15,true);
+  B.ground(0,30).ground(36,60).ground(66,96).ground(140,231);
+  B.coins(6,3,3).row(10,5,'?M?').enemy('zappy',16,8,{rx:5}).enemy('boing',20).cannon(26,2,3.2).arc(30,4,7);
+  B.enemy('zappy',42,8,{rx:5}).enemy('zappy',52,10,{rx:5}).row(46,5,'B?B').enemy('prickle',56).arc(60,4,7);
+  B.cannon(70,2,3).cannon(70,3,3,1.5).wind(74,2,86,8,-11,0).sign(72,'A headwind, and rockets with it.').cannon(90,2,2.8).row(80,5,'?F?');
+  /* the thunderhead: cloud ledges up into the storm */
+  B.checkpoint(93);
+  B.row(98,4,'===').row(103,7,'===').row(98,10,'===').row(104,13,'====').row(110,16,'===').row(116,19,'=====').coins(98,5,3).coins(103,8,3).coins(98,11,3).coins(105,14,2).coins(110,17,3);
+  B.enemy('zappy',108,22,{rx:6}).enemy('batty',112,12,{rx:3}).row(118,23,'?F?').shard(123,24);
+  /* down the far side: a stair of cloud, and above it a long glide marked out in coins */
+  B.row(124,16,'===').row(129,13,'===').row(134,10,'===').row(138,7,'===').row(140,4,'==');
+  for(let i=0;i<10;i++) B.coins(124+i*3,21-i*2,1);
+  B.shard(146,22,'fluff').wind(144,2,147,20,0,60);
+  B.enemy('boing',150).cannon(156,2,3).enemy('zappy',162,8,{rx:5}).row(166,5,'B?B').warp(172,2,'in').enemy('prickle',178).enemy('zappy',184,9,{rx:5}).warp(190,3,'out',true);
+  B.cannon(196,2,3).cannon(196,3,3,1.5).enemy('blob',202);
+  B.stairs(206,6).fill(212,2,212,7,HARD);
+  B.goal(218);
+  /* the eye of the storm: a quiet room, a spring, and a shard */
+  B.fill(228,2,231,15,GROUND).ground(232,257).fill(232,2,232,15,HARD).fill(257,2,257,15,HARD);
+  B.warp(234,2,'in',true).warp(253,2,'out').spring(244).row(240,8,'===').row(247,8,'===').shard(244,13).coins(240,9,3).coins(247,9,3).coinCol(244,4,6);
+  return B.L;
+}
+
+/* 6-5: Lord Zappa. A short stormy run, then the thunder king: he rides high out of reach, calls down bolts onto marked
+   spots, and then sinks low to gloat. That is when to stomp him. */
+function w6l5(){
+  const B=LevelBuilder(178,'clouds');
+  B.ground(0,28).ground(34,60).ground(66,177);
+  B.coins(6,3,3).row(10,5,'?M?').enemy('zappy',17,8,{rx:5}).enemy('boing',22).arc(28,4,7);
+  B.row(38,5,'B?B').cannon(44,2,3).enemy('zappy',50,9,{rx:5}).spring(54).row(56,9,'===').shard(57,13).arc(60,4,7);
+  /* a blue stair that a switch builds */
+  B.row(70,5,'X').row(74,4,'U').row(77,6,'U').row(80,8,'UU').shard(81,10).coins(74,5,1).coins(77,7,1);
+  B.fill(86,4,86,11,HARD).fill(90,4,90,11,HARD).coinCol(88,4,5).shard(88,10).enemy('prickle',96);
+  B.checkpoint(104);
+  B.row(108,5,'?F?').row(112,5,'M').sign(115,'Lord Zappa! Keep off the sparks on the ground, and stomp him when he comes down.');
+  B.fill(161,2,177,13,GROUND);
+  B.boss(144,122,157,12,'zappa');
+  return B.L;
+}
+
+defWorld({name:'Cloud Nine',theme:'clouds',levels:[w6l1,w6l2,w6l3,w6l4,w6l5]});
 /* ================= World 7: Magma Mountain ================= */
 /* PLACEHOLDER: stands in for the real world until it is written, so the map and the checks have all forty levels. */
 THEMES.magma=Object.assign({},THEMES.shores,{music:'magma'});
@@ -4190,8 +4525,100 @@ function w8l1(){
   B.goal(207);
   return B.L;
 }
+/* 8-2: the crystal caves. Bridges of crystal that crumble over nothing at all, ghosts that follow across them, and a
+   switch that opens a wall and builds a bridge to a shard. */
+function w8l2(){
+  const B=LevelBuilder(262,'moon',20);
+  B.room(0,231).room(236,261,0,19,true);
+  B.ground(0,40).ground(60,96).ground(112,150).ground(166,235).fill(0,15,235,19,GROUND);
+  B.coins(6,3,3).row(10,6,'?M?').enemy('ghost',19,7).enemy('clonk',27,9).enemy('spikit',34);
+  B.row(41,1,'KKKKKKKKKKKKKKKKKKK').coins(43,3,15).shard(50,7).enemy('ghost',47,9);
+  B.row(64,6,'B?X').sign(62,'Hit the switch: the red wall opens.').enemy('w8boing',70);
+  B.fill(76,2,77,14,RED).row(81,8,'UUU').shard(82,12).enemy('clonk',87,9).enemy('spikit',92);
+  B.row(97,1,'KKKKK').row(105,1,'KKKKKKK').coins(98,3,3).coins(106,3,5).enemy('batty',103,7,{rx:3});
+  B.checkpoint(116);
+  B.row(120,6,'?F?').enemy('ghost',126,5).warp(131,2,'in').enemy('clonk',137,9).enemy('ghost',141,8).warp(145,3,'out',true);
+  B.row(151,1,'KKKK').plat(156,2,3,'x',4,1.1).row(163,1,'KKK').coins(157,4,5);
+  B.enemy('fizzle',172).row(176,6,'B?B').enemy('clonk',183,9).enemy('w8boing',190).enemy('spikit',196);
+  B.stairs(204,6).fill(210,2,210,7,HARD).clear(200,15,231,19);
+  B.goal(216);
+  /* a crystal vault: one great spring, and a shard far above it */
+  B.fill(232,2,235,14,GROUND).ground(236,261).fill(236,2,236,19,HARD).fill(261,2,261,19,HARD).fill(236,16,261,19,GROUND);
+  B.warp(238,2,'in',true).warp(257,2,'out').spring(247).row(250,11,'===').shard(251,13).coinCol(247,5,7).coinBox(252,3,254,4);
+  return B.L;
+}
+
+/* 8-3: the floating stair. Up to the palace gate, chunk by drifting chunk: a lift, a pod, a rising wind, ledges that
+   fall, a cleft to kick up, and a wheel of stone to ride. */
+function w8l3(){
+  const B=LevelBuilder(84,'moon',60);
+  B.look(2).ground(0,20).start(4);
+  B.coins(7,3,3).row(10,6,'?M?').enemy('spikit',15).plat(21,2,3,'y',5,1).coinCol(22,4,4);
+  /* first chunk, and a pod to the second */
+  B.fill(26,6,40,7,GROUND).enemy('w8boing',32,8).shard(33,13).pod(42,9,18,19).sign(37,'Hop in the pod.',8);
+  B.fill(46,13,60,14,GROUND).enemy('blob',50,15).row(51,19,'?F?').enemy('batty',54,18,{rx:3});
+  /* a rising wind off the end of it */
+  B.wind(57,15,60,25,0,95).coinCol(58,17,6);
+  B.fill(62,21,76,22,GROUND).enemy('spikit',70,23).row(79,24,'H').shard(79,27).coins(66,24,4);
+  /* ledges that fall */
+  B.fall(57,25,3).fall(52,27,3).coins(58,27,1).coins(53,29,1);
+  B.fill(34,29,48,30,GROUND).checkpoint(44,31).row(40,35,'?M?').enemy('zappy',41,38,{rx:5});
+  /* the cleft: under the right wall, up between the two, and off over the left one */
+  B.fill(37,33,37,45,HARD).fill(33,31,33,38,HARD).coinCol(35,32,7);
+  B.fill(14,37,30,38,GROUND).enemy('w8boing',22,39).enemy('spikit',17,39).shard(16,44);
+  /* the wheel, and the gate */
+  B.plat(31,42,3,'c',3,1).fill(40,45,83,46,GROUND).enemy('batty',46,52,{rx:3});
+  B.goal(52,47);
+  return B.L;
+}
+
+/* 8-4: the palace halls. The longest road in the game: belts, cannons, Clonks, flame and ghosts, a hall at a time, with
+   somewhere to catch a breath between them. */
+function w8l4(){
+  const B=LevelBuilder(318,'moon',20);
+  B.room(0,287).room(292,317,0,19,true);
+  B.ground(0,60).ground(68,120).ground(128,176).ground(184,291).fill(0,16,291,19,GROUND);
+  B.coins(6,3,3).row(10,6,'?M?').enemy('spikit',16);
+  /* the hall of belts */
+  B.conveyor(20,30,1,1).enemy('clonk',25,9).conveyor(34,44,1,-1).enemy('clonk',39,9).coins(21,3,9).enemy('ghost',48,8).row(52,6,'B?B');
+  B.plat(61,2,3,'x',3,1.2).coins(62,4,4);
+  /* the hall of cannons */
+  B.cannon(74,2,3).cannon(74,3,3,1.5).enemy('fizzle',80).cannon(88,2,2.8).fill(96,2,96,3,HARD).cannon(96,4,3).enemy('w8boing',102).row(106,6,'?F?').shard(107,11);
+  B.cannon(114,2,3.2).fall(121,2,3).fall(125,2,2);
+  B.checkpoint(132);
+  /* the hall of flame */
+  B.jet(138,2,4,2.6).jet(142,2,4,2.6,0.9).jet(146,2,4,2.6,1.8).firebar(154,7,6,1.5).enemy('spikit',160).firebar(166,7,6,-1.5).row(159,6,'?M?');
+  B.fill(170,4,170,13,HARD).fill(174,4,174,13,HARD).coinCol(172,4,7).shard(172,13);
+  B.plat(177,2,3,'x',3,1.1).coins(178,4,4);
+  /* the long gallery: ghosts, a switch, and the Queen's guard */
+  B.enemy('ghost',192,8).row(196,6,'X').fill(204,2,205,15,RED).enemy('clonk',212,9).enemy('ghost',218,5).warp(224,2,'in').enemy('rammy',232).enemy('clonk',240,9).warp(246,3,'out',true);
+  B.conveyor(250,258,1,-1).jet(261,2,4,2.4).enemy('fizzle',264);
+  B.stairs(266,6).fill(272,2,272,7,HARD).clear(262,16,287,19);
+  B.goal(278);
+  /* the treasury */
+  B.fill(288,2,291,15,GROUND).ground(292,317).fill(292,2,292,19,HARD).fill(317,2,317,19,HARD).fill(292,16,317,19,GROUND);
+  B.warp(294,2,'in',true).warp(313,2,'out').coinBox(299,3,310,5).row(302,9,'=====').shard(304,10).enemy('ghost',308,11).row(300,6,'?L?');
+  return B.L;
+}
+
+/* 8-5: the throne. Up the red carpet past the last of the guard, and then Queen Grizzle: she walks, hops and lobs bombs;
+   hurt, her landings send ripples along the floor; cornered, she charges too, and throws three bombs at a time. */
+function w8l5(){
+  const B=LevelBuilder(180,'moon',20);
+  B.ground(0,179).fill(0,16,179,19,GROUND);
+  B.coins(6,3,3).row(10,6,'?M?').enemy('spikit',17).enemy('clonk',24,9).cannon(32,2,3).cannon(32,3,3,1.5).enemy('ghost',40,8);
+  B.row(46,6,'===').row(50,9,'===').shard(51,13).coins(46,7,3);
+  B.jet(58,2,4,2.6).jet(62,2,4,2.6,1.3).enemy('fizzle',68).fill(74,4,74,13,HARD).fill(78,4,78,13,HARD).coinCol(76,4,7).shard(76,13);
+  B.enemy('clonk',86,9).enemy('rammy',92).row(96,2,'X').row(99,6,'U').row(102,9,'UU').shard(103,12);
+  B.checkpoint(108);
+  B.row(112,6,'?M?').row(116,6,'F').sign(119,'Queen Grizzle. Five stomps. Jump the ripples, mind the bombs, and get out of the way when she charges.');
+  B.row(128,6,'====').row(150,6,'====').fill(164,2,179,15,GROUND);
+  B.boss(150,124,160,15,'queen');
+  return B.L;
+}
+
 function w8stub(look){ return ()=>{ const B=LevelBuilder(120,'moon'); B.look(look); B.ground(0,119).shard(8,3).shard(10,3).shard(12,3).row(20,6,'?M?').spring(30).pod(40,3,0,24).fill(50,2,50,14,HARD).fill(54,2,54,14,HARD); if(look===4) B.fill(100,2,119,13,GROUND).boss(80,60,95,15,'queen'); else B.goal(100); return B.L; }; }
-defWorld({name:'Lunar Palace',theme:'moon',levels:[w8l1,w8stub(1),w8stub(2),w8stub(3),w8stub(4)]});
+defWorld({name:'Lunar Palace',theme:'moon',levels:[w8l1,w8l2,w8l3,w8l4,w8l5]});
 /* ================= the world map: the island, the route and the rules of walking ================= */
 finishWorlds();
 /* Nothing in this file draws. The island is a grid of voxel columns, MAP_W cells west to east and MAP_D north to south,
