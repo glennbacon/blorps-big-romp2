@@ -121,10 +121,15 @@ node tools/check-levels.js              # every level and every shard; add --job
 node tools/check-levels.js 4-2          # one level
 node tools/check-levels.js --quick 4-2  # the way to the flag only, not the shards
 node tools/check-levels.js --map 4-2    # print a level as text
+node tools/check-map.js                 # the world map: its route, walking, opening levels, controls
+node tools/check-map.js --map           # print the islands as text
+node tools/check-save.js                # saved progress, moon shards and Continue
 node tools/check-audio.js               # every sound effect and every tune
 ```
 
 These need Node.js and nothing else. The level check loads the game code from `src/` with the 3D and page layers stubbed out, then has a search bot play each level with the real rules until it reaches the flag or beats the boss. Each level is played as small Blorp and as big Blorp, who must not get hurt, and the bot jumps 5% lower than a player can. The bot then goes after each of the three moon shards. It also reports common slips, such as a monster placed in mid-air, a pipe that leads nowhere, a roof low enough to hit when jumping for the flag, or a tree standing in front of the checkpoint flag. Run it after editing a level.
+
+The map check proves there is one marker per level, that the path moves one cell at a time, never climbs more than one step, never crosses or runs alongside itself and is never hidden by the ground, and then drives the real walking rules, the flow between map and levels, and the map's keys and touch pad. The save check starts the game the way a page load does, with a stand-in for the browser's storage, and checks what is saved at each point and what the title screen offers afterwards. The audio check calls every effect and plays every tune twice through against a strict stand-in for Web Audio.
 
 ## Making levels
 
@@ -254,7 +259,23 @@ A world's file may also add monsters of its own with `defEnemy` (see `src/g_enem
 
 ## Editing the map
 
-See the comments at the top of `src/m_map.js`.
+The islands are painted in `buildIsle` in `src/m_map.js` with a small builder, on a grid 64 cells wide and 44 deep with north at the top. Heights are in steps of half a tile, and each piece of land belongs to a world (0 to 7).
+
+```js
+B.blob(10,36,8.4,5.6,0,2)        // an ellipse of land: middle, radii, world, height
+ .raise(5.5,33.6,3,2,0.7)        // a hill on land that is already there: middle, radius, extra height, roundness
+ .flat(9,39.5,6,1.6,1)           // level an area
+ .plate(29,30,31,32,6)           // set a rectangle of land to one height
+ .pool(24.6,33.2,1.4,1,MK_POND)  // turn land into water, lava or goo
+ .cut(8.5,4,0.6,3.6)             // take land away
+ .lift(41,8,24,6.4,12)           // make land float, its underside at this height
+ .tidy()                         // smooth the coast
+ .route(4,38,['EEENN','NNN'])    // where the path starts, then compass moves from each marker to the next
+```
+
+The route's heights are worked out from the land it crosses: it cuts and fills by halves so that no step is more than one high, and it bridges sea, lava and thin air by itself. The scenery, the landmarks and everything that moves on the map are in `src/n_mapview.js`. Run `node tools/check-map.js` after any change.
+
+On the map, `__romp.open(40)` opens every level, `__romp.at(12)` stands Blorp on a marker, and `__romp.zoom(2.6)` pulls the camera back far enough to see everything.
 
 ## Credits
 

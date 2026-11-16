@@ -133,7 +133,9 @@ function animate(dt,time){
   for(const c of clouds){ c.m.position.x+=c.v*dt; if(c.m.position.x>W+70) c.m.position.x=-70; }
   for(const c of critters) c.tick(dt,time);
   /* whatever lamps the scenery has near the camera get the glow lights that are left */
-  if(lamps.length&&glowN<glowLights.length){ let best=null, bd=viewHalfW+4; for(const l of lamps){ const d=Math.abs(l.x-camX); if(d<bd){ bd=d; best=l; } } if(best) glowAt(best.x,best.y,best.z,best.col,best.power||1,best.reach||8); }
+  if(lamps.length&&glowN<glowLights.length){ let a=null, b=null, ad=1e9, bd=1e9;
+    for(const l of lamps){ const d=Math.hypot(l.x-player.x,(l.y-player.y)*1.3); if(d<ad){ b=a; bd=ad; a=l; ad=d; } else if(d<bd){ b=l; bd=d; } }
+    for(const q of [[a,ad],[b,bd]]){ const l=q[0], k=l?clamp(1.5-q[1]/(viewHalfW+2),0,1):0; if(k>0) glowAt(l.x,l.y,l.z,l.col,(l.power||1)*k,l.reach||8); } }
   glowEnd();
   /* hint signs speak up when Blorp stands by them */
   let near=null; for(const s of signs) if(Math.abs(player.x-s.x)<1.7&&Math.abs(player.y-s.y)<2.5) near=s;

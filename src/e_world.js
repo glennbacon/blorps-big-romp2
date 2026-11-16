@@ -368,8 +368,12 @@ function updateCamera(dt,snap){
     camLead+=((p.face*1.5+clamp(p.vx*0.22,-2,2))-camLead)*Math.min(1,dt*2.2);
     if(p.onGround||p.swim||p.wall||p.y<focusY) focusY=p.y; else if(p.y>focusY+4.5) focusY=p.y-4.5;
   }
-  const lo=room.y0+camBaseY, hi=Math.max(lo,room.y1-V/2+1);
-  const tx=camTargetX(), ty=clamp(lo+Math.max(0,focusY-room.y0-5)*0.92,lo,hi);
+  const lo=room.y0+camBaseY, hi=Math.max(lo,room.y1-V/2+1), d=focusY-room.y0-5;
+  /* a little way up, the view lags so the ground stays in sight; far up a tall level it follows Blorp tile for tile,
+     keeping what is above him on screen; and by a flag that stands on high ground it frames the whole pole */
+  let rise=d<=0?0:d<=10?d*0.92:9.2+(d-10);
+  if(L.goal&&L.goal.y>2&&Math.abs(focusY-L.goal.y)<2.5&&Math.abs(p.x-L.goal.x)<20) rise=L.goal.y-2-room.y0;
+  const tx=camTargetX(), ty=clamp(lo+rise,lo,hi);
   if(snap){ camX=tx; camY=ty; } else { camX+=(tx-camX)*Math.min(1,dt*6); camY+=(ty-camY)*Math.min(1,dt*3.2); }
   let sx=0,sy=0;
   if(shakeT>0){ shakeT-=dt; if(!reduceMotion){ sx=(Math.random()-0.5)*shakeA; sy=(Math.random()-0.5)*shakeA; } }

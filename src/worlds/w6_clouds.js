@@ -21,26 +21,27 @@ function w6Rainbow(list,cx,cy,z,r){ const cols=['#ff5a5f','#ffa23e','#ffe14d','#
 
 THEMES.clouds={ music:'clouds',
   sky:['#2f86f0','#8fd0ff','#fff3e0'], skyMid:0.48, glowCol:0xfff3c0, sunGlow:0.9,
-  fog:0xdff1ff, fogNear:18, fogFar:150,
+  fog:0x9fd0fa, fogNear:22, fogFar:170,
   hemiSky:0xffffff, hemiGround:0xc9d9f0, hemiI:0.66, sunI:0.62, sunCol:0xfff6e0, sunDir:[-0.42,0.78,0.5],
   top:'#7fe06a', topS:['#8ff07f','#6fd65e','#9af58a','#74dc64'], dirt:'#f0e2c4', dirtS:['#e6d6b4','#f7ecd4','#dccaa4'], cap:'#7fe06a', capL:'#b4f59a', capD:'#4aa84a',
   brick:['#ff9ec4','#d05a8a','#ffd0e4'], hard:['#e6f0ff','#ffffff','#a9c0e6'], pipe:['#ffc928','#fff0a8','#c98a00','#6b4a00'],
   semi:'cloud', plat:['#ffd166','#d98f24'], dust:'#ffffff', back:-4, fringe:['#7fe06a','#55c94f','#b4f59a'],
   liquid:{kind:'void'}, disc:['#ffe14d','#fff3a0','#e08a12'], cloud:'#ffffff', bank:'#f4faff', bloom:0.85, hi:0.1,
   looks:[null,
-    {sky:['#5a9cf5','#c2e4ff','#ffe9f4'],fog:0xeaf3ff,bank:'#fff4fb',rainbows:3},
-    {sky:['#f08a5c','#ffc890','#fff0c2'],fog:0xffe0bc,sunCol:0xffc890,hemiSky:0xffe6d0,glowCol:0xffa060,sunDir:[-0.66,0.45,0.5],disc:['#ff9a3d','#ffd27a','#b3520f'],cloud:'#ffd9c0',bank:'#ffe2c8'},
-    {sky:['#2a3350','#55607f','#8a94aa'],fog:0x6a7490,fogFar:110,hemiSky:0xc9d4f0,hemiGround:0x6a7490,hemiI:0.6,sunI:0.5,sunCol:0xd0dcff,sunGlow:0.2,cloud:'#7a84a2',bank:'#8a94b0',storm:true},
-    {sky:['#241a4a','#5a3a7a','#c96a6a'],fog:0x6a4a80,fogFar:120,hemiSky:0xe0c8ff,hemiGround:0x6a4a80,hemiI:0.58,sunI:0.56,sunCol:0xffc0a0,glowCol:0xff7a5a,sunDir:[-0.6,0.5,0.5],disc:['#ff7a4d','#ffb37a','#a8320f'],cloud:'#8a6aa0',bank:'#9a7ab0',storm:true,stars:0.4}],
+    {sky:['#5a9cf5','#c2e4ff','#ffe9f4'],fog:0xb8d8ff,bank:'#fff4fb',deep:'#7fb0f0',rainbows:3},
+    {sky:['#f08a5c','#ffc890','#fff0c2'],fog:0xffe0bc,sunCol:0xffc890,hemiSky:0xffe6d0,glowCol:0xffa060,sunDir:[-0.66,0.45,0.5],disc:['#ff9a3d','#ffd27a','#b3520f'],cloud:'#ffd9c0',bank:'#ffe2c8',deep:'#e08a6a'},
+    {sky:['#2a3350','#55607f','#8a94aa'],fog:0x6a7490,fogFar:110,hemiSky:0xc9d4f0,hemiGround:0x6a7490,hemiI:0.6,sunI:0.5,sunCol:0xd0dcff,sunGlow:0.2,cloud:'#7a84a2',bank:'#8a94b0',deep:'#3a4460',storm:true},
+    {sky:['#241a4a','#5a3a7a','#c96a6a'],fog:0x6a4a80,fogFar:120,hemiSky:0xe0c8ff,hemiGround:0x6a4a80,hemiI:0.58,sunI:0.56,sunCol:0xffc0a0,glowCol:0xff7a5a,sunDir:[-0.6,0.5,0.5],disc:['#ff7a4d','#ffb37a','#a8320f'],cloud:'#8a6aa0',bank:'#9a7ab0',deep:'#3a2a5a',storm:true,stars:0.4}],
   scenery(S,R){
     const W=S.W, H=S.H, far=S.far, soft=S.soft, bank=TH.bank;
     /* the sea of cloud: one bank in front of the lane's feet, one close behind, and others out to the horizon */
-    w6Bank(soft,-30,W+30,0.2,2.6,0.9,R,bank); w6Bank(soft,-30,W+30,0.7,-4.3,2.5,R,bank);
-    for(const q of [[-9,1.5],[-16,2.2],[-26,3],[-40,3.6],[-60,4.4]]) w6Bank(soft,-60,W+60,q[1],q[0],5,R,shade(bank,0.97));
-    soft.push([-80,-9,-90,W+160,10.5,86,shade(bank,0.95)]);
+    const deep=TH.deep||'#5fa8ea';
+    w6Bank(far,-30,W+30,-0.1,2.6,0.9,R,bank); w6Bank(far,-30,W+30,0.3,-4.3,2.5,R,mixc(bank,deep,0.1));
+    [[-9,0.7],[-16,1],[-26,1.3],[-40,1.6],[-60,2]].forEach((q,k)=>w6Bank(far,-60,W+60,q[1],q[0],5,R,mixc(bank,deep,0.16+k*0.08)));
+    far.push([-80,-9,-90,W+160,9.6,86,mixc(bank,deep,0.4)]);
     /* far islands, each with a waterfall that spills into nothing; towers of cumulus; rainbows */
     for(let x=-30;x<W+30;x+=22+R()*26){ const z=-18-R()*34, y=4+R()*9, e=w6Isle(far,x,y,z,6+R()*8,R); if(R()<0.5) S.glowFar.push([e[0],y-7,z+1.5,0.7,7.4,0.3,'#bfeaff']); }
-    for(let x=-50;x<W+50;x+=30+R()*30){ const z=-64-R()*16; let w=16+R()*12, y=2; for(let k=0;k<5;k++){ soft.push([x-w/2,y,z,w,3.4,6,TH.cloud]); y+=3.4; w*=0.74; } }
+    for(let x=-50;x<W+50;x+=30+R()*30){ const z=-64-R()*16; let w=16+R()*12, y=2; for(let k=0;k<5;k++){ far.push([x-w/2,y,z,w,3.4,6,TH.cloud]); y+=3.4; w*=0.74; } }
     for(let i=0;i<(TH.rainbows||1);i++) w6Rainbow(soft,W*(i+0.5)/(TH.rainbows||1)+(R()-0.5)*20,1,-58,20+R()*8);
     for(let x=-50;x<W+50;x+=8+R()*9) S.addCloud(x,5+R()*(H-4),-10-R()*46,R,TH.cloud==='#ffffff'?undefined:TH.cloud);
     for(let x=10;x<W;x+=40+R()*30) S.addCloud(x,3+R()*3,-5.6,R,TH.cloud==='#ffffff'?undefined:TH.cloud,0.6);

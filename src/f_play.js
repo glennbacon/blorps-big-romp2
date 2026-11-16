@@ -229,7 +229,8 @@ function updatePlayer(dt){
   p.launchT=Math.max(0,p.launchT-dt); p.poundT=Math.max(0,p.poundT-dt); p.flapT=Math.max(0,p.flapT-dt); p.dustT-=dt; G.coinT-=dt; G.swCool-=dt;
   if(p.star>0){ p.star-=dt; if(p.star<=0){ p.star=0; musicRate(G.bossSeen?1.12:1); } }
   if(p.pod){ const q=p.pod; q.t-=dt; p.x=q.pod.x; p.y=q.pod.y-p.h/2; p.vx=p.vy=0;
-    if(q.t<=0){ const d=q.pod; p.pod=null; p.vx=Math.sin(d.ang)*d.power; p.vy=Math.cos(d.ang)*d.power; p.launchT=0.55; p.airMax=Math.max(RUN_MAX,Math.abs(p.vx)); p.springHold=true; p.jumping=true; p.gHold=28.125; p.gFall=98.4; p.onGround=false; p.face=p.vx<0?-1:1;
+    if(q.t<=0){ const d=q.pod; p.pod=null; if(solidAt(Math.floor(p.x),Math.floor(p.y))) p.y=Math.floor(p.y)+1; /* a big Blorp in a pod on the floor is not fired out of the floor */
+      p.vx=Math.sin(d.ang)*d.power; p.vy=Math.cos(d.ang)*d.power; p.launchT=0.55; p.airMax=Math.max(RUN_MAX,Math.abs(p.vx)); p.springHold=true; p.jumping=true; p.gHold=28.125; p.gFall=98.4; p.onGround=false; p.face=p.vx<0?-1:1;
       d.t=0.4; sfx.launch(); shake(0.2); burst(d.x,d.y,'#fff3a0',10,6,0.14,0.5,true); if(p.form===3) p.airJumps=1; }
     return; }
   if(p.riding){ const pl=p.riding; if(pl.dx) moveX(p,pl.dx); p.y+=pl.dy; }
