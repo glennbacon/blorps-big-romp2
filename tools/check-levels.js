@@ -287,12 +287,12 @@ const names=args.filter((a,i)=>!a.startsWith('--')&&i!==jobsAt+1||(jobsAt<0&&!a.
 if(jobs>1){
   const {spawnSync,spawn}=require('child_process');
   const hx0=loadGame(harness).api, all=[]; for(let i=0;i<hx0.count;i++) all.push(hx0.info(i).label);
-  const picked=names.length?all.filter(l=>names.includes(l)):all, out=new Map(); let left=picked.length, next=0, bad=0;
+  const picked=names.length?all.filter(l=>names.includes(l)):all, out=new Map(); let left=picked.length, next=0, shown=0, bad=0;
   const go=()=>{ if(next>=picked.length) return; const l=picked[next++]; let buf='';
     const c=spawn(process.execPath,[__filename,l].concat(flag('quick')?['--quick']:[]));
     c.stdout.on('data',d=>buf+=d); c.stderr.on('data',d=>buf+=d);
     c.on('close',code=>{ out.set(l,buf.split('\n').filter(s=>s&&!/^all 1 levels|^1 of 1 levels/.test(s)).join('\n')); if(code) bad++;
-      while(picked.length&&out.has(picked[0])){ console.log(out.get(picked.shift())); }
+      while(shown<picked.length&&out.has(picked[shown])) console.log(out.get(picked[shown++]));
       if(--left===0){ console.log(bad?bad+' levels failed':'all levels can be finished'); process.exit(bad?1:0); } go(); }); };
   for(let i=0;i<jobs;i++) go();
   return;
