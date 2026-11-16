@@ -247,5 +247,47 @@ function w4l3(){
   return B.L;
 }
 
+/* 4-4: the manor. Indoors by candlelight: Clonks over the corridors, ghosts in the long hall, and a cellar of three
+   pipes of which only one leads on. */
+function w4l4(){
+  const B=LevelBuilder(266,'hollow');
+  B.room(0,233).room(238,265,0,15,true).set('w4in',[24,196]);
+  B.ground(0,237).fill(24,12,196,15,GROUND).fill(24,5,25,11,HARD).fill(195,5,196,11,HARD);
+  B.coins(6,3,3).row(11,5,'?M?').enemy('boing',17).sign(21,'The manor. Clonks wait over the corridors: let them drop, then pass.');
+  B.enemy('clonk',33,8).row(38,5,'?B?').enemy('clonk',45,8).enemy('ghost',54,6).enemy('spikit',58).coins(48,3,4);
+  B.fill(66,5,67,11,HARD).row(72,5,'B?B').row(76,8,'===').shard(77,9).coins(76,9,1).enemy('fizzle',84).enemy('ghost',90,3).enemy('clonk',97,8);
+  /* the cellar door: three pipes. The first leads back, the last to a cupboard, the middle one on. */
+  B.fill(104,5,105,11,HARD).sign(107,'Three pipes. One of them is the way on.');
+  B.warp(111,2,'back').warp(117,2,'on').warp(123,2,'cup').fill(129,2,130,11,HARD).warp(70,2,'back',true).warp(134,2,'on',true).warp(100,2,'cup2',true);
+  B.checkpoint(140);
+  B.row(144,5,'BMB').enemy('ghost',150,7).enemy('shellby',154).enemy('ghost',160,2.5);
+  /* a shard on a shelf that only a bounce off a Clonk's head will reach */
+  B.enemy('clonk',167,7).row(170,9,'HHH').shard(171,10).enemy('ghost',178,6).enemy('spikit',183).row(187,5,'?I?');
+  B.stairs(204,6).fill(210,2,210,7,HARD);
+  B.goal(216);
+  /* the cupboard under the stairs: a ghost, a great many coins, and the third shard */
+  B.fill(234,2,237,15,GROUND).ground(238,265).fill(238,2,238,15,HARD).fill(265,2,265,15,HARD).fill(238,12,265,15,GROUND);
+  B.warp(240,2,'cup',true).warp(261,2,'cup2').coinBox(245,3,256,5).enemy('ghost',258,8).row(249,8,'=====').shard(251,9).row(246,5,'=');
+  return B.L;
+}
+
+/* 4-5: Count Boohoo. A short run through the manor's garden, then the Count: he fades out and drifts overhead where
+   nothing can touch him, shows himself, swoops low across the room, and sits winded on the floor for a moment. */
+function w4l5(){
+  const B=LevelBuilder(176,'hollow');
+  B.ground(0,34).ground(40,70).ground(76,175);
+  B.coins(6,3,3).row(10,5,'?M?').enemy('ghost',18,6).enemy('spikit',22).row(27,4,'==').row(30,7,'==').shard(31,10).coins(27,5,2);
+  B.plat(35,2,3,'x',2,1.2).enemy('batty',46,6,{rx:2.5}).enemy('fizzle',52).row(56,5,'B?B').enemy('ghost',62,3).arc(70,4,7);
+  /* a switch, a blue stair it builds, and a shard at the top of the stair */
+  B.row(80,5,'X').row(84,4,'U').row(87,6,'U').row(90,8,'UU').shard(91,10).coins(84,5,1).coins(87,7,1);
+  /* two gateposts to kick up between */
+  B.fill(96,4,96,11,HARD).fill(100,4,100,11,HARD).coinCol(98,4,5).shard(98,10);
+  B.checkpoint(106);
+  B.row(110,5,'?M?').sign(113,'Count Boohoo! Nothing can touch him while he is faded. Wait for the swoop, then jump on him while he gets his breath.');
+  B.fill(159,2,175,13,GROUND);
+  B.boss(144,120,155,9,'boohoo');
+  return B.L;
+}
+
 function w4stub(last){ return ()=>{ const B=LevelBuilder(120,'hollow'); B.ground(0,119).shard(8,3).shard(10,3).shard(12,3); if(last) B.fill(100,2,119,13,GROUND).boss(80,60,95,9,'boohoo'); else B.goal(100); return B.L; }; }
-defWorld({name:'Spooky Hollow',theme:'hollow',levels:[w4l1,w4l2,w4l3,w4stub(),w4stub(true)]});
+defWorld({name:'Spooky Hollow',theme:'hollow',levels:[w4l1,w4l2,w4l3,w4l4,w4l5]});

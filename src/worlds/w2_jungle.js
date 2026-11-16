@@ -260,5 +260,51 @@ function w2l3(){
   return B.L;
 }
 
+/* 2-4: the ruins. Old stone bridges that crumble underfoot, Prickles lobbing seeds from their pedestals, Chompers in the
+   pipes, and a switch that opens a door through the temple wall. */
+function w2l4(){
+  const B=LevelBuilder(266,'jungle');
+  B.room(0,233).room(238,265,0,15,true);
+  B.ground(0,34).ground(50,84).ground(100,140).ground(156,237);
+  B.coins(6,3,3).row(11,5,'?M?').enemy('blob',16).pipe(21,3,true).enemy('snippy',27);
+  B.sign(31,'These old stones crumble underfoot. Keep moving.');
+  B.row(35,1,'KKKKKKKKKKKKKKK').coins(37,3,11).enemy('snapper',42.5,2,{rise:4,phase:0.6});
+  /* the temple wall: over the top by the planks, or through the red door once the switch is hit */
+  B.fill(54,2,56,4,HARD).enemy('prickle',55,5).row(60,5,'B?X').sign(58,'Hit the switch: red blocks open, and blue ones turn solid.');
+  B.pipe(66,2).row(70,5,'==').row(73,8,'==').coins(70,6,2).coins(73,9,2);
+  B.fill(76,4,77,8,HARD).fill(76,2,77,3,RED).row(80,5,'UU').row(83,8,'UU').shard(84,10).coins(80,6,2);
+  B.row(85,1,'KKKKK').row(92,1,'KKKKKKKK').enemy('snapper',90.5,2,{rise:4.5}).enemy('batty',95,6,{rx:2.5}).coins(86,3,3).coins(93,3,6);
+  B.checkpoint(104);
+  B.row(108,5,'?M?').enemy('boing',112).fill(116,2,118,3,HARD).enemy('prickle',117,4).enemy('rammy',128);
+  B.warp(122,2,'in').warp(134,3,'out',true).arc(140,4,6);
+  B.row(141,1,'KKKK').plat(146,2,3,'x',4,1.2).row(153,1,'KKK').enemy('snapper',145,2,{rise:3.5,phase:1}).coins(147,4,5);
+  B.pipe(162,3,true).enemy('shellby',167).pipe(171,2,true).spring(178).row(181,9,'====').shard(183,12).coins(181,10,4);
+  B.fill(188,2,190,3,HARD).enemy('prickle',189,4).row(194,5,'B?B').enemy('boing',199);
+  B.stairs(206,6).fill(212,2,212,7,HARD);
+  B.goal(218);
+  /* the vault under the temple: stones that crumble as a stair, and a shard at the top of them */
+  B.fill(234,2,237,15,GROUND).ground(238,265).fill(238,2,238,15,HARD).fill(265,2,265,15,HARD);
+  B.warp(240,2,'in',true).warp(261,2,'out').row(246,4,'KK').row(249,6,'KK').row(252,8,'KK').row(255,10,'HH').shard(256,11).coinBox(244,3,245,3).coinBox(257,3,259,5).row(250,3,'?L?');
+  return B.L;
+}
+
+/* 2-5: Big Bongo. A short, lively run of springs and Bonks, then the drum-beater himself: he strolls up, then by turns
+   leaps (the landing sends ripples along the ground) and charges (and stuns himself on the wall). */
+function w2l5(){
+  const B=LevelBuilder(176,'jungle');
+  B.ground(0,40).ground(46,175);
+  B.coins(6,3,3).row(10,5,'?M?').enemy('rammy',19).spring(27).row(30,9,'===').coins(30,10,3).shard(31,13).arc(40,4,7);
+  B.enemy('boing',52).row(56,5,'B?B').enemy('rammy',66).fill(72,2,73,4,BRICK).pipe(78,3,true);
+  /* two pillars to kick up between */
+  B.fill(86,4,86,11,HARD).fill(90,4,90,11,HARD).coinCol(88,4,5).shard(88,10);
+  /* a brick-roofed box: pound in from the top once big, or look round the back */
+  B.fill(96,2,96,5,HARD).fill(100,4,100,5,HARD).row(97,5,'BBB').row(97,4,'BBB').shard(98,2).fill(95,2,95,3,HARD);
+  B.checkpoint(106);
+  B.row(110,5,'?M?').sign(113,'Big Bongo! Jump his ripples, and stomp him when he is dizzy, or any time you dare.');
+  B.row(124,5,'===').row(146,5,'===').fill(159,2,175,13,GROUND);
+  B.boss(144,120,155,9,'bongo');
+  return B.L;
+}
+
 function w2stub(last){ return ()=>{ const B=LevelBuilder(120,'jungle'); B.ground(0,119).shard(8,3).shard(10,3).shard(12,3); if(last) B.fill(100,2,119,13,GROUND).boss(80,60,95,9,'bongo'); else B.goal(100); return B.L; }; }
-defWorld({name:'Jellybean Jungle',theme:'jungle',levels:[w2l1,w2l2,w2l3,w2stub(),w2stub(true)]});
+defWorld({name:'Jellybean Jungle',theme:'jungle',levels:[w2l1,w2l2,w2l3,w2l4,w2l5]});
