@@ -2,11 +2,19 @@
 
 A voxel platformer with a 2.5D side-scrolling view, built with [three.js](https://threejs.org/), and the sequel to [Blorp's Big Romp](https://github.com/glennbacon/blorps-big-romp). Queen Grizzle has smashed the moon and scattered the pieces. Blorp, a one-eyed teal monster, crosses eight worlds and forty levels to get them back: three moon shards are hidden in every level, 120 in all.
 
+**[Play it in your browser](https://glennbacon.github.io/arcade/blorps-big-romp-2/)**
+
+![The title screen, Sprinkle Shores, swimming in Fizzy Deep, and the world map](screenshot.png)
+
+It is one of the games in [Glenn Bacon's arcade](https://glennbacon.github.io/arcade/), next to the first game.
+
 The whole game is one HTML file. There are no image or sound files: every model is built in code from boxes, every texture is drawn on a 16×16 canvas, and all music and sound effects are synthesized with the Web Audio API.
 
 ## Play
 
-Open `index.html` in a current version of Chrome, Safari, Firefox or Edge. Nothing needs installing. An internet connection is needed because three.js and the fonts load from CDNs.
+Play online at <https://glennbacon.github.io/arcade/blorps-big-romp-2/>.
+
+To run it from a copy of this repository, open `index.html` in a current version of Chrome, Safari, Firefox or Edge. Nothing needs installing. An internet connection is needed either way because three.js and the fonts load from CDNs.
 
 ## Controls
 
@@ -104,6 +112,7 @@ Walking, running, skidding and jumping use the NES Super Mario Bros. speeds and 
 | `src/z_flow.js` | Level loading, animation, screens, saving, input and the main loop |
 | `src/tail.html` | Closing markup |
 | `build.sh` | Joins the pieces in `src/` into `index.html` |
+| `screenshot.png` | The picture at the top of this page |
 | `tools/` | Checks that run in Node (see below) |
 
 ## Build
